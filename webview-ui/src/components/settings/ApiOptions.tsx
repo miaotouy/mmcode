@@ -1123,9 +1123,7 @@ const ApiOptions = ({
 							onChange={(field, value) => setApiConfigurationField(field, value)}
 						/>
 						<div className="flex flex-col gap-1">
-							<label className="block font-medium mb-1">
-								{t("settings:advanced.toolProtocol.label")}
-							</label>
+							<label className="block font-medium mb-1">{t("settings:toolProtocol.label")}</label>
 							<Select
 								value={apiConfiguration.toolProtocol || "native"}
 								onValueChange={(value) => setApiConfigurationField("toolProtocol", value as any)}>
@@ -1138,7 +1136,7 @@ const ApiOptions = ({
 								</SelectContent>
 							</Select>
 							<div className="text-vscode-descriptionForeground text-sm mt-1">
-								{t("settings:advanced.toolProtocol.description")}
+								{t("settings:toolProtocol.description")}
 							</div>
 						</div>
 						{selectedModelInfo?.supportsTemperature !== false && (
