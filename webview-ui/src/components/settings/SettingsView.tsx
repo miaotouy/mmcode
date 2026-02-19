@@ -57,6 +57,11 @@ import {
 	AlertDialogHeader,
 	AlertDialogFooter,
 	Button,
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
 	Tooltip,
 	TooltipContent,
 	TooltipProvider,
@@ -264,6 +269,8 @@ const SettingsView = forwardRef<SettingsViewRef, SettingsViewProps>((props, ref)
 		includeCurrentTime,
 		includeCurrentCost,
 		maxGitStatusFiles,
+		preferredToolProtocol, // kilocode_change
+		setPreferredToolProtocol, // kilocode_change
 	} = cachedState
 
 	const apiConfiguration = useMemo(() => cachedState.apiConfiguration ?? {}, [cachedState.apiConfiguration])
@@ -600,6 +607,7 @@ const SettingsView = forwardRef<SettingsViewRef, SettingsViewProps>((props, ref)
 					includeCurrentTime: includeCurrentTime ?? true,
 					includeCurrentCost: includeCurrentCost ?? true,
 					maxGitStatusFiles: maxGitStatusFiles ?? 0,
+					preferredToolProtocol, // kilocode_change
 					profileThresholds,
 					imageGenerationProvider,
 					openRouterImageApiKey,
@@ -1033,6 +1041,33 @@ const SettingsView = forwardRef<SettingsViewRef, SettingsViewProps>((props, ref)
 								<SectionHeader>{t("settings:sections.providers")}</SectionHeader>
 
 								<Section>
+									{/* kilocode_change start: Global Tool Protocol Setting */}
+									<div className="flex flex-col gap-1 mb-4 pb-4 border-b border-vscode-panel-border">
+										<div className="flex items-center gap-2 mb-2">
+											<span className="font-bold text-vscode-foreground">
+												{t("settings:toolProtocol.globalControl")}
+											</span>
+										</div>
+										<label className="block font-medium mb-1">
+											{t("settings:toolProtocol.label")} ({t("settings:toolProtocol.default")})
+										</label>
+										<Select
+											value={preferredToolProtocol || "xml"}
+											onValueChange={(value) => setPreferredToolProtocol(value as any)}>
+											<SelectTrigger className="w-full">
+												<SelectValue placeholder={t("settings:common.select")} />
+											</SelectTrigger>
+											<SelectContent>
+												<SelectItem value="native">Native (JSON)</SelectItem>
+												<SelectItem value="xml">XML Tags</SelectItem>
+											</SelectContent>
+										</Select>
+										<div className="text-vscode-descriptionForeground text-sm mt-1">
+											{t("settings:toolProtocol.description")}
+										</div>
+									</div>
+									{/* kilocode_change end */}
+
 									{/* kilocode_change start changes to allow for editting a non-active profile */}
 									<ApiConfigManager
 										currentApiConfigName={editingApiConfigName}

@@ -179,6 +179,7 @@ const ApiOptions = ({
 		cloudIsAuthenticated,
 		claudeCodeIsAuthenticated,
 		openAiCodexIsAuthenticated,
+		preferredToolProtocol, // kilocode_change
 	} = useExtensionState()
 
 	const [customHeaders, setCustomHeaders] = useState<[string, string][]>(() => {
@@ -1125,12 +1126,22 @@ const ApiOptions = ({
 						<div className="flex flex-col gap-1">
 							<label className="block font-medium mb-1">{t("settings:toolProtocol.label")}</label>
 							<Select
-								value={apiConfiguration.toolProtocol || "native"}
-								onValueChange={(value) => setApiConfigurationField("toolProtocol", value as any)}>
+								value={apiConfiguration.toolProtocol || "default"}
+								onValueChange={(value) =>
+									setApiConfigurationField(
+										"toolProtocol",
+										value === "default" ? undefined : (value as any),
+									)
+								}>
 								<SelectTrigger className="w-full">
 									<SelectValue placeholder={t("settings:common.select")} />
 								</SelectTrigger>
 								<SelectContent>
+									<SelectItem value="default">
+										{t("settings:toolProtocol.currentDefault", {
+											protocol: preferredToolProtocol === "xml" ? "XML" : "Native (JSON)",
+										})}
+									</SelectItem>
 									<SelectItem value="native">Native (JSON)</SelectItem>
 									<SelectItem value="xml">XML Tags</SelectItem>
 								</SelectContent>

@@ -1062,6 +1062,7 @@ export class ClineProvider
 			experiments,
 			cloudUserInfo,
 			taskSyncEnabled,
+			preferredToolProtocol,
 		} = await this.getState()
 
 		const task = new Task({
@@ -1082,6 +1083,7 @@ export class ClineProvider
 			onCreated: this.taskCreationCallback,
 			startTask: options?.startTask ?? true,
 			enableBridge: BridgeOrchestrator.isEnabled(cloudUserInfo, taskSyncEnabled),
+			preferredToolProtocol,
 			// Preserve the status from the history item to avoid overwriting it when the task saves messages
 			initialStatus: historyItem.status,
 		})
@@ -3225,6 +3227,7 @@ export class ClineProvider
 			experiments,
 			cloudUserInfo,
 			remoteControlEnabled,
+			preferredToolProtocol,
 		} = await this.getState()
 
 		// Single-open-task invariant: always enforce for user-initiated top-level tasks
@@ -3257,6 +3260,7 @@ export class ClineProvider
 			taskNumber: this.clineStack.length + 1,
 			onCreated: this.taskCreationCallback,
 			enableBridge: BridgeOrchestrator.isEnabled(cloudUserInfo, remoteControlEnabled),
+			preferredToolProtocol,
 			initialTodos: options.initialTodos,
 			...options,
 		})
@@ -3521,7 +3525,7 @@ export class ClineProvider
 	}
 
 	private async getTaskProperties(): Promise<DynamicAppProperties & TaskProperties> {
-		const { language = "en", mode, apiConfiguration } = await this.getState()
+		const { language = "en", mode, apiConfiguration, preferredToolProtocol } = await this.getState()
 
 		const task = this.getCurrentTask()
 		const todoList = task?.todoList
@@ -3548,7 +3552,12 @@ export class ClineProvider
 			// kilocode_change start
 			currentTaskSize: task?.clineMessages.length,
 			taskHistorySize: this.kiloCodeTaskHistorySizeForTelemetryOnly || undefined,
-			toolStyle: resolveToolProtocol(apiConfiguration, task?.api?.getModel().info),
+			toolStyle: resolveToolProtocol(
+				apiConfiguration,
+				task?.api?.getModel().info,
+				undefined,
+				preferredToolProtocol,
+			),
 			// kilocode_change end
 		}
 	}
@@ -3580,7 +3589,7 @@ export class ClineProvider
 	public async getTelemetryProperties(): Promise<TelemetryProperties> {
 		// kilocode_change start
 		const state = await this.getState()
-		const { apiConfiguration, experiments } = state
+		const { apiConfiguration, experiments, preferredToolProtocol } = state
 		const task = this.getCurrentTask()
 
 		async function getModelId() {

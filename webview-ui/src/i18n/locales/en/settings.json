@@ -430,9 +430,6 @@
 		"getZaiApiKey": "Get Z AI API Key",
 		"zaiEntrypoint": "Z AI Entrypoint",
 		"zaiEntrypointDescription": "Please select the appropriate API entrypoint based on your location. If you are in China, choose open.bigmodel.cn. Otherwise, choose api.z.ai.",
-		"minimaxApiKey": "MiniMax API Key",
-		"getMiniMaxApiKey": "Get MiniMax API Key",
-		"minimaxBaseUrl": "MiniMax Entrypoint",
 		"geminiApiKey": "Gemini API Key",
 		"getGroqApiKey": "Get Groq API Key",
 		"groqApiKey": "Groq API Key",
@@ -950,6 +947,7 @@
 	},
 	"toolProtocol": {
 		"label": "Tool Call Protocol",
+		"globalControl": "Global Control",
 		"description": "Choose how MM Code communicates with the API. Native uses the provider's function calling API, while XML uses XML-formatted tool definitions.",
 		"default": "Default",
 		"xml": "XML",

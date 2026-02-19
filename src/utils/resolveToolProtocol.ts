@@ -22,12 +22,14 @@ type ApiMessageForDetection = Anthropic.MessageParam & {
  * @param providerSettings - The provider settings
  * @param _modelInfo - Unused, kept for API compatibility
  * @param lockedProtocol - Optional task-locked protocol that takes absolute precedence
+ * @param preferredToolProtocol - Optional global preferred tool protocol
  * @returns The resolved tool protocol (either "xml" or "native")
  */
 export function resolveToolProtocol(
 	providerSettings: ProviderSettings,
 	_modelInfo?: unknown,
 	lockedProtocol?: ToolProtocol,
+	preferredToolProtocol?: ToolProtocol,
 ): ToolProtocol {
 	// 1. Locked Protocol - task-level lock takes absolute precedence
 	// This ensures resumed tasks continue using their original protocol
@@ -40,7 +42,12 @@ export function resolveToolProtocol(
 		return providerSettings.toolProtocol
 	}
 
-	// 3. Default to Native protocol for new tasks
+	// 3. Global preference
+	if (preferredToolProtocol) {
+		return preferredToolProtocol
+	}
+
+	// 4. Default to Native protocol for new tasks
 	return TOOL_PROTOCOL.NATIVE
 }
 

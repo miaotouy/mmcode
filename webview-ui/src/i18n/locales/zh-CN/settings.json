@@ -630,7 +630,6 @@
 			"none": "无",
 			"minimal": "最小 (最快)",
 			"high": "高",
-			"xhigh": "超高",
 			"medium": "中",
 			"low": "低",
 			"xhigh": "极高"
@@ -910,6 +909,7 @@
 	},
 	"toolProtocol": {
 		"label": "工具调用协议",
+		"globalControl": "全局控制",
 		"description": "选择 MM Code 如何与 API 通信。原生使用提供商的函数调用 API，而 XML 使用 XML 格式的工具定义。",
 		"default": "默认",
 		"xml": "XML",

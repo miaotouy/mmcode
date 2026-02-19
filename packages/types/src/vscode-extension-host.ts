@@ -569,6 +569,7 @@ export type ExtensionState = Pick<
 	| "maxGitStatusFiles"
 	| "requestDelaySeconds"
 	| "selectedMicrophoneDevice" // kilocode_change: Selected microphone device for STT
+	| "preferredToolProtocol" // kilocode_change
 > & {
 	version: string
 	clineMessages: ClineMessage[]

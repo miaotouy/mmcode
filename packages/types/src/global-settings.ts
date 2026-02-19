@@ -249,6 +249,7 @@ export const globalSettingsSchema = z.object({
 	lastModeExportPath: z.string().optional(),
 	lastModeImportPath: z.string().optional(),
 	appendSystemPrompt: z.string().optional(), // kilocode_change: Custom text to append to system prompt (CLI only)
+	preferredToolProtocol: z.enum(["xml", "native"]).optional(), // kilocode_change: Global default tool protocol
 })
 
 export type GlobalSettings = z.infer<typeof globalSettingsSchema>

@@ -189,6 +189,7 @@ export interface TaskOptions extends CreateTaskOptions {
 	onCreated?: (task: Task) => void
 	initialTodos?: TodoItem[]
 	workspacePath?: string
+	preferredToolProtocol?: ToolProtocol
 	/** Initial status for the task's history item (e.g., "active" for child tasks) */
 	initialStatus?: "active" | "delegated" | "completed"
 }
@@ -264,6 +265,7 @@ export class Task extends EventEmitter<TaskEvents> implements TaskLike {
 	 * @private
 	 */
 	private _taskToolProtocol: ToolProtocol | undefined
+	private _preferredToolProtocol: ToolProtocol | undefined
 
 	/**
 	 * Promise that resolves when the task mode has been initialized.
@@ -505,10 +507,12 @@ export class Task extends EventEmitter<TaskEvents> implements TaskLike {
 		onCreated,
 		initialTodos,
 		workspacePath,
+		preferredToolProtocol,
 		initialStatus,
 	}: TaskOptions) {
 		super()
 		this.context = context // kilocode_change
+		this._preferredToolProtocol = preferredToolProtocol
 
 		if (startTask && !task && !images && !historyItem) {
 			throw new Error("Either historyItem or task/images must be provided")
@@ -630,7 +634,12 @@ export class Task extends EventEmitter<TaskEvents> implements TaskLike {
 			// This ensures the task will continue using this protocol even if
 			// user settings change.
 			const modelInfo = this.api.getModel().info
-			this._taskToolProtocol = resolveToolProtocol(this.apiConfiguration, modelInfo)
+			this._taskToolProtocol = resolveToolProtocol(
+				this.apiConfiguration,
+				modelInfo,
+				undefined,
+				this._preferredToolProtocol,
+			)
 		}
 
 		// Initialize the assistant message parser based on the locked tool protocol.
@@ -2149,7 +2158,12 @@ export class Task extends EventEmitter<TaskEvents> implements TaskLike {
 			} else {
 				// No tool calls in history yet - use current settings
 				const modelInfo = this.api.getModel().info
-				this._taskToolProtocol = resolveToolProtocol(this.apiConfiguration, modelInfo)
+				this._taskToolProtocol = resolveToolProtocol(
+					this.apiConfiguration,
+					modelInfo,
+					undefined,
+					this._preferredToolProtocol,
+				)
 			}
 
 			// Update parser state to match the detected/resolved protocol
