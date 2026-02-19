@@ -647,6 +647,9 @@ export class Task extends EventEmitter<TaskEvents> implements TaskLike {
 		// For history items without a persisted protocol, we default to XML parser
 		// and will update it in resumeTaskFromHistory after detection.
 		const effectiveProtocol = this._taskToolProtocol || "xml"
+		console.log(
+			`[Task#constructor] taskId: ${this.taskId}, lockedProtocol: ${this._taskToolProtocol}, preferred: ${this._preferredToolProtocol}, effective: ${effectiveProtocol}`,
+		)
 		this.assistantMessageParser = effectiveProtocol !== "native" ? new AssistantMessageParser() : undefined
 
 		this.messageQueueService = new MessageQueueService()
@@ -2979,6 +2982,17 @@ export class Task extends EventEmitter<TaskEvents> implements TaskLike {
 					this._taskToolProtocol,
 				)
 				const shouldUseXmlParser = streamProtocol === "xml"
+				console.log(
+					`[Task#apiRequest] taskId: ${this.taskId}, streamProtocol: ${streamProtocol}, shouldUseXmlParser: ${shouldUseXmlParser}, hasParser: ${!!this.assistantMessageParser}`,
+				)
+
+				// [KINGFALL] Self-healing logic: if we need XML parser but don't have one, create it now.
+				if (shouldUseXmlParser && !this.assistantMessageParser) {
+					console.warn(
+						`[Task#apiRequest] taskId: ${this.taskId} Missing XML parser for XML protocol! Initializing now.`,
+					)
+					this.assistantMessageParser = new AssistantMessageParser()
+				}
 
 				// Yields only if the first chunk is successful, otherwise will
 				// allow the user to retry the request (most likely due to rate
@@ -3869,6 +3883,9 @@ export class Task extends EventEmitter<TaskEvents> implements TaskLike {
 
 						// Only show error and count toward mistake limit after 2 consecutive failures
 						if (this.consecutiveNoToolUseCount >= 2) {
+							console.error(
+								`[Task#MODEL_NO_TOOLS_USED] taskId: ${this.taskId}, streamProtocol: ${streamProtocol}, didToolUse: ${didToolUse}, contentBlocks: ${this.assistantMessageContent.length}`,
+							)
 							await this.say("error", "MODEL_NO_TOOLS_USED")
 							// Only count toward mistake limit after second consecutive failure
 							this.consecutiveMistakeCount++
