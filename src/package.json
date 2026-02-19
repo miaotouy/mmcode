@@ -140,7 +140,7 @@
 			},
 			{
 				"command": "mm-code.exportSettings",
-				"title": "Export Settings",
+				"title": "%command.exportSettings.title%",
 				"category": "%configuration.title%"
 			},
 			{
@@ -285,7 +285,7 @@
 			},
 			{
 				"command": "mm-code.agentManagerOpen",
-				"title": "Open Agent Manager",
+				"title": "%command.agentManager.title%",
 				"icon": "$(circuit-board)",
 				"category": "%configuration.title%"
 			},
