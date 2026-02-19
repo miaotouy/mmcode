@@ -29,7 +29,7 @@ type AutocompleteServiceSettingsViewProps = HTMLAttributes<HTMLDivElement> & {
 
 // Get the list of supported provider keys from AUTOCOMPLETE_PROVIDER_MODELS
 const SUPPORTED_AUTOCOMPLETE_PROVIDER_KEYS = Array.from(AUTOCOMPLETE_PROVIDER_MODELS.keys())
-const AUTOCOMPLETE_SERVICE_KEYBINDING_COMMAND_IDS = ["kilo-code.autocomplete.generateSuggestions"]
+const AUTOCOMPLETE_SERVICE_KEYBINDING_COMMAND_IDS = ["mm-code.autocomplete.generateSuggestions"]
 
 export const AutocompleteServiceSettingsView = ({
 	ghostServiceSettings,
@@ -127,7 +127,9 @@ export const AutocompleteServiceSettingsView = ({
 						label={t("kilocode:autocomplete.settings.enableAutoTrigger.label")}
 						className="flex flex-col gap-1">
 						<VSCodeCheckbox checked={enableAutoTrigger || false} onChange={onEnableAutoTriggerChange}>
-							<span className="font-medium">{t("kilocode:autocomplete.settings.enableAutoTrigger.label")}</span>
+							<span className="font-medium">
+								{t("kilocode:autocomplete.settings.enableAutoTrigger.label")}
+							</span>
 						</VSCodeCheckbox>
 						<div className="text-vscode-descriptionForeground text-sm mt-1">
 							{t("kilocode:autocomplete.settings.enableAutoTrigger.description")}
@@ -192,7 +194,7 @@ export const AutocompleteServiceSettingsView = ({
 							settingId="autocomplete-smart-inline-task-keybinding"
 							section="autocomplete"
 							label={t("kilocode:autocomplete.settings.enableSmartInlineTaskKeybinding.label", {
-								keybinding: keybindings["kilo-code.autocomplete.generateSuggestions"],
+								keybinding: keybindings["mm-code.autocomplete.generateSuggestions"],
 							})}
 							className="flex flex-col gap-1">
 							<VSCodeCheckbox
@@ -200,20 +202,20 @@ export const AutocompleteServiceSettingsView = ({
 								onChange={onEnableSmartInlineTaskKeybindingChange}>
 								<span className="font-medium">
 									{t("kilocode:autocomplete.settings.enableSmartInlineTaskKeybinding.label", {
-										keybinding: keybindings["kilo-code.autocomplete.generateSuggestions"],
+										keybinding: keybindings["mm-code.autocomplete.generateSuggestions"],
 									})}
 								</span>
 							</VSCodeCheckbox>
 							<div className="text-vscode-descriptionForeground text-sm mt-1">
 								<Trans
 									i18nKey="kilocode:autocomplete.settings.enableSmartInlineTaskKeybinding.description"
-									values={{ keybinding: keybindings["kilo-code.autocomplete.generateSuggestions"] }}
+									values={{ keybinding: keybindings["mm-code.autocomplete.generateSuggestions"] }}
 									components={{
 										DocsLink: (
 											<a
 												href="#"
 												onClick={() =>
-													openGlobalKeybindings("kilo-code.autocomplete.generateSuggestions")
+													openGlobalKeybindings("mm-code.autocomplete.generateSuggestions")
 												}
 												className="text-[var(--vscode-list-highlightForeground)] hover:underline cursor-pointer"></a>
 										),
@@ -263,11 +265,15 @@ export const AutocompleteServiceSettingsView = ({
 							{provider && model ? (
 								<>
 									<div className="text-vscode-descriptionForeground">
-										<span className="font-medium">{t("kilocode:autocomplete.settings.provider")}:</span>{" "}
+										<span className="font-medium">
+											{t("kilocode:autocomplete.settings.provider")}:
+										</span>{" "}
 										{provider}
 									</div>
 									<div className="text-vscode-descriptionForeground">
-										<span className="font-medium">{t("kilocode:autocomplete.settings.model")}:</span>{" "}
+										<span className="font-medium">
+											{t("kilocode:autocomplete.settings.model")}:
+										</span>{" "}
 										{model}
 									</div>
 								</>
