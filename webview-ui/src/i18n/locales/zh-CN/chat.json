@@ -29,7 +29,8 @@
 		"openInCloud": "在 Roo Code Cloud 中打开任务",
 		"openInCloudIntro": "从任何地方继续监控或与 Roo 交互。扫描、点击或复制以打开。",
 		"openApiHistory": "打开 API 历史",
-		"openUiHistory": "打开 UI 历史"
+		"openUiHistory": "打开 UI 历史",
+		"copyChat": "复制对话内容"
 	},
 	"history": {
 		"title": "历史"

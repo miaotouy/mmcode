@@ -264,7 +264,7 @@ export function MessageList({ sessionId }: MessageListProps) {
 				data={allItems}
 				itemContent={itemContent}
 				atBottomStateChange={setIsAtBottom}
-				increaseViewportBy={{ top: 400, bottom: 400 }}
+				increaseViewportBy={{ top: 1500, bottom: 1500 }}
 				className="am-messages-list"
 				followOutput={isAtBottom ? "smooth" : false}
 			/>

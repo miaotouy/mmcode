@@ -29,7 +29,8 @@
 		"openInCloud": "Open task in Kilo Code Cloud",
 		"openInCloudIntro": "Keep monitoring or interacting with Kilo from anywhere. Scan, click or copy to open.",
 		"openApiHistory": "Open API History",
-		"openUiHistory": "Open UI History"
+		"openUiHistory": "Open UI History",
+		"copyChat": "Copy chat content"
 	},
 	"history": {
 		"title": "History"

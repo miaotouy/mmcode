@@ -1762,7 +1762,7 @@ const ChatViewComponent: React.ForwardRefRenderFunction<ChatViewRef, ChatViewPro
 								ref={virtuosoRef}
 								key={task.ts}
 								className="scrollable grow overflow-y-scroll mb-1"
-								increaseViewportBy={{ top: 400, bottom: 400 }} // kilocode_change: use more modest numbers to see if they reduce gray screen incidence
+								increaseViewportBy={{ top: 1500, bottom: 1500 }} // kilocode_change: increased to reduce gray screen incidence and improve copy-paste experience
 								data={groupedMessages}
 								itemContent={itemContent}
 								followOutput={(isAtBottom: boolean) => isAtBottom || stickyFollowRef.current}

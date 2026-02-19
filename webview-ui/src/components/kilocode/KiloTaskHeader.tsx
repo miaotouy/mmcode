@@ -1,8 +1,8 @@
 // kilocode_change: new file
-import { memo, useRef, useState } from "react"
+import { memo, useRef, useState, useCallback } from "react"
 import { useWindowSize } from "react-use"
 import { useTranslation } from "react-i18next"
-import { CloudUpload, CloudDownload, FoldVertical } from "lucide-react"
+import { CloudUpload, CloudDownload, FoldVertical, Copy, Check } from "lucide-react"
 import { validateSlashCommand } from "@/utils/slash-commands"
 
 import type { ClineMessage } from "@roo-code/types"
@@ -13,6 +13,7 @@ import { formatLargeNumber } from "@src/utils/format"
 import { formatCost } from "@/utils/costFormatting"
 import { cn } from "@src/lib/utils"
 import { Button, StandardTooltip } from "@src/components/ui"
+import { useCopyToClipboard } from "@src/utils/clipboard"
 import { useExtensionState } from "@src/context/ExtensionStateContext"
 import { useSelectedModel } from "@/components/ui/hooks/useSelectedModel"
 import { useTaskDiffStats } from "@/components/ui/hooks/kilocode/useTaskDiffStats"
@@ -67,6 +68,7 @@ const KiloTaskHeader = ({
 	const { apiConfiguration, currentTaskItem, customModes } = useExtensionState()
 	const { id: modelId, info: model } = useSelectedModel(apiConfiguration)
 	const [isTaskExpanded, setIsTaskExpanded] = useState(false)
+	const { showCopyFeedback, copyWithFeedback } = useCopyToClipboard()
 
 	// Aggregate diff stats from all accepted file operations in the current task
 	// Use clineMessages from extension state which contains the full message history with isAnswered flags
@@ -91,6 +93,65 @@ const KiloTaskHeader = ({
 	)
 
 	const hasTodos = todos && Array.isArray(todos) && todos.length > 0
+
+	const handleCopyChat = useCallback(
+		(e: React.MouseEvent) => {
+			const messagesToExport: ClineMessage[] = []
+			groupedMessages.forEach((item) => {
+				if (Array.isArray(item)) {
+					messagesToExport.push(...item)
+				} else {
+					messagesToExport.push(item)
+				}
+			})
+
+			let markdown = `# Task\n\n${task.text}\n\n---\n\n`
+
+			messagesToExport.forEach((msg) => {
+				const text = msg.text || ""
+
+				if (msg.type === "say") {
+					switch (msg.say) {
+						case "text":
+							markdown += `### Kilo\n\n${text}\n\n`
+							break
+						case "user_feedback":
+							markdown += `### User\n\n${text}\n\n`
+							break
+						case "completion_result":
+							markdown += `### Task Completed\n\n${text}\n\n`
+							break
+						case "error":
+							markdown += `### Error\n\n${text}\n\n`
+							break
+						case "reasoning":
+							markdown += `### Reasoning\n\n${text}\n\n`
+							break
+					}
+				} else if (msg.type === "ask") {
+					switch (msg.ask) {
+						case "command":
+							markdown += `### Command\n\n\`\`\`bash\n${text}\n\`\`\`\n\n`
+							break
+						case "tool":
+							try {
+								const tool = JSON.parse(text)
+								markdown += `### Tool Use: ${tool.tool}\n\n${tool.path ? `Path: ${tool.path}\n\n` : ""}${tool.content || tool.diff || ""}\n\n`
+							} catch {
+								markdown += `### Tool Use\n\n${text}\n\n`
+							}
+							break
+						case "followup":
+							markdown += `### Question\n\n${text}\n\n`
+							break
+					}
+				}
+			})
+
+			copyWithFeedback(markdown, e)
+		},
+		[task, groupedMessages, copyWithFeedback],
+	)
 
 	return (
 		<div className="py-2 px-3">
@@ -119,11 +180,22 @@ const KiloTaskHeader = ({
 							)}
 						</div>
 					</div>
-					<StandardTooltip content={t("chat:task.closeAndStart")}>
-						<Button variant="ghost" size="icon" onClick={onClose} className="shrink-0 w-5 h-5">
-							<span className="codicon codicon-close" />
-						</Button>
-					</StandardTooltip>
+					<div className="flex items-center gap-1">
+						<StandardTooltip content={t("chat:task.copyChat")}>
+							<Button
+								variant="ghost"
+								size="icon"
+								onClick={handleCopyChat}
+								className="shrink-0 w-5 h-5 text-vscode-foreground/60 hover:text-vscode-foreground">
+								{showCopyFeedback ? <Check size={14} /> : <Copy size={14} />}
+							</Button>
+						</StandardTooltip>
+						<StandardTooltip content={t("chat:task.closeAndStart")}>
+							<Button variant="ghost" size="icon" onClick={onClose} className="shrink-0 w-5 h-5">
+								<span className="codicon codicon-close" />
+							</Button>
+						</StandardTooltip>
+					</div>
 				</div>
 				{/* Collapsed state: Track context and cost if we have any */}
 				{!isTaskExpanded && contextWindow > 0 && (
