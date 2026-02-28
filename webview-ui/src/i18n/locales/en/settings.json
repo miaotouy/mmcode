@@ -753,7 +753,7 @@
 		},
 		"sendMessageOnEnter": {
 			"label": "Send message with Enter",
-			"description": "When enabled, press Enter to send and Shift+Enter for a new line. Turn off to use Shift+Enter to send instead."
+			"description": "When enabled, press Enter to send messages. Regardless of this setting, Ctrl+Enter always sends and Shift+Enter always adds a new line."
 		},
 		"costThreshold": {
 			"label": "Hide cost below threshold",

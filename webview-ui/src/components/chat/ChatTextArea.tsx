@@ -816,7 +816,7 @@ export const ChatTextArea = forwardRef<HTMLTextAreaElement, ChatTextAreaProps>(
 				const shouldSendMessage = // kilocode_change start: Send message handling
 					!isComposing &&
 					event.key === "Enter" &&
-					((sendMessageOnEnter && !event.shiftKey) || (!sendMessageOnEnter && event.shiftKey))
+					(event.ctrlKey || event.metaKey || (sendMessageOnEnter && !event.shiftKey))
 
 				if (shouldSendMessage) {
 					event.preventDefault()

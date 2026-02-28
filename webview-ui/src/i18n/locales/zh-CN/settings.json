@@ -1169,7 +1169,7 @@
 		},
 		"sendMessageOnEnter": {
 			"label": "使用回车键发送消息",
-			"description": "启用后，按回车键发送消息，Shift+回车键换行。禁用后，使用Shift+回车键发送消息。"
+			"description": "启用后，按回车键发送消息。无论是否启用，Ctrl+回车键始终发送消息，Shift+回车键始终换行。"
 		},
 		"costThreshold": {
 			"label": "隐藏低于阈值的费用",
