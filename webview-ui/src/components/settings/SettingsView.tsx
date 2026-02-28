@@ -657,20 +657,10 @@ const SettingsView = forwardRef<SettingsViewRef, SettingsViewProps>((props, ref)
 			// kilocode_change end - Auto-purge settings
 			vscode.postMessage({ type: "debugSetting", bool: cachedState.debug })
 
-			// kilocode_change: After saving, sync cachedState to extensionState without clobbering
-			// the editing profile's apiConfiguration when editing a non-active profile.
-			if (editingApiConfigName !== currentApiConfigName) {
-				// Only sync non-apiConfiguration fields from extensionState
-				const { apiConfiguration: _, ...restOfExtensionState } = extensionState
-				setCachedState((prevState) => ({
-					...prevState,
-					...restOfExtensionState,
-				}))
-			} else {
-				// When editing the active profile, sync everything including apiConfiguration
-				setCachedState((prevState) => ({ ...prevState, ...extensionState }))
-			}
-			// kilocode_change end
+			// After saving, we keep the cachedState as is and reset change detection.
+			// The extension will broadcast the new state, which will eventually update extensionState.
+			// Since isChangeDetected becomes false, the useEffect will then sync the new extensionState
+			// to cachedState, but only when it actually arrives.
 			setChangeDetected(false)
 		}
 	}
@@ -1299,6 +1289,18 @@ const SettingsView = forwardRef<SettingsViewRef, SettingsViewProps>((props, ref)
 								includeTaskHistoryInEnhance={includeTaskHistoryInEnhance}
 								setIncludeTaskHistoryInEnhance={(value) =>
 									setCachedStateField("includeTaskHistoryInEnhance", value)
+								}
+								enhancementApiConfigId={cachedState.enhancementApiConfigId}
+								setEnhancementApiConfigId={(value) =>
+									setCachedStateField("enhancementApiConfigId", value)
+								}
+								condensingApiConfigId={cachedState.condensingApiConfigId}
+								setCondensingApiConfigId={(value) =>
+									setCachedStateField("condensingApiConfigId", value)
+								}
+								customCondensingPrompt={cachedState.customCondensingPrompt}
+								setCustomCondensingPrompt={(value) =>
+									setCachedStateField("customCondensingPrompt", value)
 								}
 							/>
 						)}

@@ -26,6 +26,12 @@ interface PromptsSettingsProps {
 	setCustomSupportPrompts: (prompts: Record<string, string | undefined>) => void
 	includeTaskHistoryInEnhance?: boolean
 	setIncludeTaskHistoryInEnhance?: (value: boolean) => void
+	enhancementApiConfigId?: string
+	setEnhancementApiConfigId?: (value: string) => void
+	condensingApiConfigId?: string
+	setCondensingApiConfigId?: (value: string) => void
+	customCondensingPrompt?: string
+	setCustomCondensingPrompt?: (value: string) => void
 }
 
 const PromptsSettings = ({
@@ -33,16 +39,22 @@ const PromptsSettings = ({
 	setCustomSupportPrompts,
 	includeTaskHistoryInEnhance: propsIncludeTaskHistoryInEnhance,
 	setIncludeTaskHistoryInEnhance: propsSetIncludeTaskHistoryInEnhance,
+	enhancementApiConfigId: propsEnhancementApiConfigId,
+	setEnhancementApiConfigId: propsSetEnhancementApiConfigId,
+	condensingApiConfigId: propsCondensingApiConfigId,
+	setCondensingApiConfigId: propsSetCondensingApiConfigId,
+	customCondensingPrompt: propsCustomCondensingPrompt,
+	setCustomCondensingPrompt: propsSetCustomCondensingPrompt,
 }: PromptsSettingsProps) => {
 	const { t } = useAppTranslation()
 	const {
 		listApiConfigMeta,
-		enhancementApiConfigId,
-		setEnhancementApiConfigId,
-		condensingApiConfigId,
-		setCondensingApiConfigId,
-		customCondensingPrompt,
-		setCustomCondensingPrompt,
+		enhancementApiConfigId: contextEnhancementApiConfigId,
+		setEnhancementApiConfigId: contextSetEnhancementApiConfigId,
+		condensingApiConfigId: contextCondensingApiConfigId,
+		setCondensingApiConfigId: contextSetCondensingApiConfigId,
+		customCondensingPrompt: contextCustomCondensingPrompt,
+		setCustomCondensingPrompt: contextSetCustomCondensingPrompt,
 		includeTaskHistoryInEnhance: contextIncludeTaskHistoryInEnhance,
 		setIncludeTaskHistoryInEnhance: contextSetIncludeTaskHistoryInEnhance,
 	} = useExtensionState()
@@ -50,6 +62,15 @@ const PromptsSettings = ({
 	// Use props if provided, otherwise fall back to context
 	const includeTaskHistoryInEnhance = propsIncludeTaskHistoryInEnhance ?? contextIncludeTaskHistoryInEnhance ?? true
 	const setIncludeTaskHistoryInEnhance = propsSetIncludeTaskHistoryInEnhance ?? contextSetIncludeTaskHistoryInEnhance
+
+	const enhancementApiConfigId = propsEnhancementApiConfigId ?? contextEnhancementApiConfigId
+	const setEnhancementApiConfigId = propsSetEnhancementApiConfigId ?? contextSetEnhancementApiConfigId
+
+	const condensingApiConfigId = propsCondensingApiConfigId ?? contextCondensingApiConfigId
+	const setCondensingApiConfigId = propsSetCondensingApiConfigId ?? contextSetCondensingApiConfigId
+
+	const customCondensingPrompt = propsCustomCondensingPrompt ?? contextCustomCondensingPrompt
+	const setCustomCondensingPrompt = propsSetCustomCondensingPrompt ?? contextSetCustomCondensingPrompt
 
 	const [testPrompt, setTestPrompt] = useState("")
 	const [isEnhancing, setIsEnhancing] = useState(false)
@@ -77,10 +98,6 @@ const PromptsSettings = ({
 
 		if (type === "CONDENSE") {
 			setCustomCondensingPrompt(finalValue ?? supportPrompt.default.CONDENSE)
-			vscode.postMessage({
-				type: "updateCondensingPrompt",
-				text: finalValue ?? supportPrompt.default.CONDENSE,
-			})
 			// Also update the customSupportPrompts to trigger change detection
 			const updatedPrompts = { ...customSupportPrompts }
 			if (finalValue === undefined) {
@@ -103,10 +120,6 @@ const PromptsSettings = ({
 	const handleSupportReset = (type: SupportPromptType) => {
 		if (type === "CONDENSE") {
 			setCustomCondensingPrompt(supportPrompt.default.CONDENSE)
-			vscode.postMessage({
-				type: "updateCondensingPrompt",
-				text: supportPrompt.default.CONDENSE,
-			})
 			// Also update the customSupportPrompts to trigger change detection
 			const updatedPrompts = { ...customSupportPrompts }
 			delete updatedPrompts[type]
@@ -210,16 +223,8 @@ const PromptsSettings = ({
 										const newConfigId = value === "-" ? "" : value
 										if (activeSupportOption === "ENHANCE") {
 											setEnhancementApiConfigId(newConfigId)
-											vscode.postMessage({
-												type: "enhancementApiConfigId",
-												text: value,
-											})
 										} else {
 											setCondensingApiConfigId(newConfigId)
-											vscode.postMessage({
-												type: "updateSettings",
-												updatedSettings: { condensingApiConfigId: newConfigId },
-											})
 										}
 									}}>
 									<SelectTrigger data-testid="api-config-select" className="w-full">
@@ -269,11 +274,6 @@ const PromptsSettings = ({
 												}
 
 												setIncludeTaskHistoryInEnhance(target.checked)
-
-												vscode.postMessage({
-													type: "updateSettings",
-													updatedSettings: { includeTaskHistoryInEnhance: target.checked },
-												})
 											}}>
 											<span className="font-medium">
 												{t("prompts:supportPrompts.enhance.includeTaskHistory")}
