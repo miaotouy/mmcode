@@ -286,26 +286,14 @@ export class MarketplaceManager {
 				// File doesn't exist or can't be read, skip
 			}
 
-			// kilocode_change start - Check skills in .kilocode/skills/
-			const projectSkillsPath = path.join(workspaceFolder.uri.fsPath, ".kilocode", "skills")
-			try {
-				const entries = await fs.readdir(projectSkillsPath, { withFileTypes: true })
-				for (const entry of entries) {
-					if (entry.isDirectory()) {
-						// Check if SKILL.md exists in the directory
-						const skillFilePath = path.join(projectSkillsPath, entry.name, "SKILL.md")
-						try {
-							await fs.access(skillFilePath)
-							metadata[entry.name] = {
-								type: "skill",
-							}
-						} catch {
-							// SKILL.md doesn't exist, skip
-						}
-					}
-				}
-			} catch (error) {
-				// Directory doesn't exist or can't be read, skip
+			// kilocode_change start - Check skills in .kilocode/skills/ and .claude/skills/
+			const projectSkillsPaths = [
+				path.join(workspaceFolder.uri.fsPath, ".kilocode", "skills"),
+				path.join(workspaceFolder.uri.fsPath, ".claude", "skills"),
+			]
+
+			for (const projectSkillsPath of projectSkillsPaths) {
+				await this.scanForInstalledSkills(projectSkillsPath, metadata)
 			}
 			// kilocode_change end
 		} catch (error) {
@@ -356,28 +344,47 @@ export class MarketplaceManager {
 
 			// kilocode_change start - Check global skills
 			const globalSkillsPath = path.join(getGlobalRooDirectory(), "skills")
-			try {
-				const entries = await fs.readdir(globalSkillsPath, { withFileTypes: true })
-				for (const entry of entries) {
-					if (entry.isDirectory()) {
-						// Check if SKILL.md exists in the directory
-						const skillFilePath = path.join(globalSkillsPath, entry.name, "SKILL.md")
-						try {
-							await fs.access(skillFilePath)
-							metadata[entry.name] = {
-								type: "skill",
-							}
-						} catch {
-							// SKILL.md doesn't exist, skip
-						}
-					}
-				}
-			} catch (error) {
-				// Directory doesn't exist or can't be read, skip
-			}
+			await this.scanForInstalledSkills(globalSkillsPath, metadata)
 			// kilocode_change end
 		} catch (error) {
 			console.error("Error checking global installations:", error)
+		}
+	}
+
+	/**
+	 * Recursively scan for installed skills (up to 2 levels deep)
+	 * kilocode_change - new helper method
+	 */
+	private async scanForInstalledSkills(
+		dirPath: string,
+		metadata: Record<string, { type: string }>,
+		depth = 0,
+	): Promise<void> {
+		if (depth > 1) return
+
+		try {
+			const entries = await fs.readdir(dirPath, { withFileTypes: true })
+			for (const entry of entries) {
+				const entryPath = path.join(dirPath, entry.name)
+
+				if (entry.isDirectory()) {
+					// Check if SKILL.md exists
+					const skillFilePath = path.join(entryPath, "SKILL.md")
+					try {
+						await fs.access(skillFilePath)
+						metadata[entry.name] = {
+							type: "skill",
+						}
+					} catch {
+						// Not a skill, try deeper if depth allows
+						if (depth < 1) {
+							await this.scanForInstalledSkills(entryPath, metadata, depth + 1)
+						}
+					}
+				}
+			}
+		} catch (error) {
+			// Skip if directory doesn't exist
 		}
 	}
 }

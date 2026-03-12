@@ -199,6 +199,55 @@ Instructions here...`
 			expect(skills[0].source).toBe("project")
 		})
 
+		it("should discover skills from .claude/skills directory", async () => {
+			const projectClaudeDir = p(PROJECT_DIR, ".claude")
+			const projectClaudeSkillsDir = p(projectClaudeDir, "skills")
+			const claudeSkillDir = p(projectClaudeSkillsDir, "claude-skill")
+			const claudeSkillMd = p(claudeSkillDir, "SKILL.md")
+
+			mockDirectoryExists.mockImplementation(async (dir: string) => {
+				return dir === projectClaudeSkillsDir
+			})
+
+			mockRealpath.mockImplementation(async (pathArg: string) => pathArg)
+
+			mockReaddir.mockImplementation(async (dir: string) => {
+				if (dir === projectClaudeSkillsDir) {
+					return ["claude-skill"]
+				}
+				return []
+			})
+
+			mockStat.mockImplementation(async (pathArg: string) => {
+				if (pathArg === claudeSkillDir) {
+					return { isDirectory: () => true }
+				}
+				throw new Error("Not found")
+			})
+
+			mockFileExists.mockImplementation(async (file: string) => {
+				return file === claudeSkillMd
+			})
+
+			mockReadFile.mockImplementation(async (file: string) => {
+				if (file === claudeSkillMd) {
+					return `---
+name: claude-skill
+description: Claude compatible skill
+---
+Instructions`
+				}
+				throw new Error("File not found")
+			})
+
+			await skillsManager.discoverSkills()
+
+			const skills = skillsManager.getAllSkills()
+			expect(skills).toHaveLength(1)
+			expect(skills[0].name).toBe("claude-skill")
+			expect(skills[0].source).toBe("project")
+		})
+
 		it("should discover mode-specific skills", async () => {
 			const refactoringDir = p(globalSkillsCodeDir, "refactoring")
 			const refactoringMd = p(refactoringDir, "SKILL.md")

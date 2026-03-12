@@ -54,29 +54,47 @@ export class SkillsManager {
 	 * Handles two symlink cases:
 	 * 1. The skills directory itself is a symlink (resolved by directoryExists using realpath)
 	 * 2. Individual skill subdirectories are symlinks
+	 *
+	 * Supports nested structure (e.g., .claude/skills/gitnexus/gitnexus-cli/SKILL.md)
 	 */
-	private async scanSkillsDirectory(dirPath: string, source: "global" | "project", mode?: string): Promise<void> {
-		if (!(await directoryExists(dirPath))) {
+	private async scanSkillsDirectory(
+		dirPath: string,
+		source: "global" | "project",
+		mode?: string,
+		depth = 0,
+	): Promise<void> {
+		if (!(await directoryExists(dirPath)) || depth > 1) {
 			return
 		}
 
 		try {
 			// Get the real path (resolves if dirPath is a symlink)
-			// If the symlink is broken, this will throw ENOENT // kilocode_change
 			const realDirPath = await fs.realpath(dirPath)
 
 			// Read directory entries
-			const entries = await fs.readdir(realDirPath)
+			const entries = await fs.readdir(realDirPath, { withFileTypes: true })
 
-			for (const entryName of entries) {
-				const entryPath = path.join(realDirPath, entryName)
+			for (const entry of entries) {
+				const entryPath = path.join(realDirPath, entry.name)
 
-				// Check if this entry is a directory (follows symlinks automatically)
-				const stats = await fs.stat(entryPath).catch(() => null)
-				if (!stats?.isDirectory()) continue
+				// Check if this entry is a directory (follows symlinks)
+				let isDirectory = entry.isDirectory()
+				if (entry.isSymbolicLink()) {
+					const stats = await fs.stat(entryPath).catch(() => null)
+					isDirectory = stats?.isDirectory() ?? false
+				}
 
-				// Load skill metadata - the skill name comes from the entry name (symlink name if symlinked)
-				await this.loadSkillMetadata(entryPath, source, mode, entryName)
+				if (!isDirectory) continue
+
+				// Check if this directory is a skill (contains SKILL.md)
+				const skillMdPath = path.join(entryPath, "SKILL.md")
+				if (await fileExists(skillMdPath)) {
+					// Load skill metadata - the skill name comes from the entry name
+					await this.loadSkillMetadata(entryPath, source, mode, entry.name)
+				} else if (depth < 1) {
+					// Recursively scan subdirectories for skills (only 1 level deep)
+					await this.scanSkillsDirectory(entryPath, source, mode, depth + 1)
+				}
 			}
 			// kilocode_change start: Handle symlink-related errors gracefully
 		} catch (error: any) {
@@ -289,6 +307,16 @@ export class SkillsManager {
 			}
 		}
 
+		// kilocode_change start: Support Claude Desktop/Code compatible skills directory
+		if (provider?.cwd) {
+			const projectClaudeDir = path.join(provider.cwd, ".claude")
+			dirs.push({ dir: path.join(projectClaudeDir, "skills"), source: "project" })
+			for (const mode of modesList) {
+				dirs.push({ dir: path.join(projectClaudeDir, `skills-${mode}`), source: "project", mode })
+			}
+		}
+		// kilocode_change end
+
 		return dirs
 	}
 
@@ -335,11 +363,19 @@ export class SkillsManager {
 		// Watch project skills directory
 		this.watchDirectory(projectSkillsDir)
 
+		// kilocode_change start: Watch Claude compatible skills directory
+		const projectClaudeSkillsDir = path.join(provider.cwd, ".claude", "skills")
+		this.watchDirectory(projectClaudeSkillsDir)
+		// kilocode_change end
+
 		// Watch mode-specific directories for all available modes
 		const modesList = await this.getAvailableModes()
 		for (const mode of modesList) {
 			this.watchDirectory(path.join(getGlobalRooDirectory(), `skills-${mode}`))
 			this.watchDirectory(path.join(provider.cwd, ".kilocode", `skills-${mode}`))
+			// kilocode_change start
+			this.watchDirectory(path.join(provider.cwd, ".claude", `skills-${mode}`))
+			// kilocode_change end
 		}
 	}
 
@@ -349,9 +385,9 @@ export class SkillsManager {
 		}
 
 		// kilocode_change start
-		// Watch for direct children (skill directories) being added/changed/deleted
-		// When anything changes, we'll rescan and look for SKILL.md files
-		const pattern = new vscode.RelativePattern(dirPath, "*")
+		// Watch for children (skill directories) being added/changed/deleted
+		// Using **/* to capture changes in nested directories (e.g. .claude/skills/gitnexus/...)
+		const pattern = new vscode.RelativePattern(dirPath, "**/*")
 		// kilocode_change end
 		const watcher = vscode.workspace.createFileSystemWatcher(pattern)
 

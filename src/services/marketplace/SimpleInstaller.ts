@@ -440,8 +440,30 @@ export class SimpleInstaller {
 	 * Remove an installed skill by deleting its directory
 	 */
 	private async removeSkill(item: SkillMarketplaceItem, target: "project" | "global"): Promise<void> {
-		const skillsDir = await this.getSkillsDirectoryPath(target)
-		const skillDir = path.join(skillsDir, item.id)
+		// kilocode_change start: Try to find the skill in multiple possible directories for project target
+		let skillDir: string | undefined
+
+		if (target === "project") {
+			const workspaceFolder = vscode.workspace.workspaceFolders?.[0]
+			if (workspaceFolder) {
+				const possiblePaths = [
+					path.join(workspaceFolder.uri.fsPath, ".kilocode", "skills", item.id),
+					path.join(workspaceFolder.uri.fsPath, ".claude", "skills", item.id),
+				]
+
+				for (const p of possiblePaths) {
+					skillDir = await this.findSkillDirectory(p, item.id)
+					if (skillDir) break
+				}
+			}
+		}
+
+		// Fallback to default path if not found or if target is global
+		if (!skillDir) {
+			const skillsDir = await this.getSkillsDirectoryPath(target)
+			skillDir = path.join(skillsDir, item.id)
+		}
+		// kilocode_change end
 
 		try {
 			// Check if the directory exists before attempting to remove
@@ -456,6 +478,43 @@ export class SimpleInstaller {
 			}
 			// Directory doesn't exist, nothing to remove
 		}
+	}
+
+	/**
+	 * Recursively find a skill directory containing SKILL.md
+	 * kilocode_change - new helper method
+	 */
+	private async findSkillDirectory(dirPath: string, skillId: string, depth = 0): Promise<string | undefined> {
+		if (depth > 1) return undefined
+
+		try {
+			const stat = await fs.stat(dirPath)
+			if (!stat.isDirectory()) return undefined
+
+			// Check if this is the skill directory
+			if (path.basename(dirPath) === skillId) {
+				const skillFilePath = path.join(dirPath, "SKILL.md")
+				try {
+					await fs.access(skillFilePath)
+					return dirPath
+				} catch {
+					// Not a skill directory
+				}
+			}
+
+			// Scan subdirectories
+			const entries = await fs.readdir(dirPath, { withFileTypes: true })
+			for (const entry of entries) {
+				if (entry.isDirectory()) {
+					const found = await this.findSkillDirectory(path.join(dirPath, entry.name), skillId, depth + 1)
+					if (found) return found
+				}
+			}
+		} catch {
+			// Path doesn't exist
+		}
+
+		return undefined
 	}
 
 	/**

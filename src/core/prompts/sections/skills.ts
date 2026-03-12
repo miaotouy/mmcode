@@ -82,7 +82,7 @@ CONSTRAINTS:
 
 <context_notes>
 - The skill list is already filtered for the current mode: "${currentMode}".
-- Mode-specific skills may come from skills-${currentMode}/ with project-level overrides taking precedence over global skills.
+- Mode-specific skills may come from skills-${currentMode}/ (in .kilocode/ or .claude/) with project-level overrides taking precedence over global skills.
 </context_notes>
 
 <internal_verification>
