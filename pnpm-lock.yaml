@@ -15841,7 +15841,7 @@ packages:
     resolution: {integrity: sha512-UsZtOYEn4tWU2RGLOXr/o/xjRBftZRlG3dEWoaHr8j4GuypJ3isitGbVyjQKAuMu+xbiop8q224TjiZWc4XTZA==}
 
   streamfilter@1.0.7:
-    resolution: {integrity: sha512-Gk6KZM+yNA1JpW0KzlZIhjo3EaBJDkYfXtYSbOwNIQ7Zd6006E6+sCFlW1NDvFG/vnXhKmw6TJJgiEQg/8lXfQ==}
+    resolution: {integrity: sha512-Gk6KZM+yNA1JpW0KzlZIhjo3EaBJDkYfXtYSbOwNIQ7Zd6996E6+sCFlW1NDvFG/vnXhKmw6TJJgiEQg/8lXfQ==}
 
   streamifier@0.1.1:
     resolution: {integrity: sha512-zDgl+muIlWzXNsXeyUfOk9dChMjlpkq0DRsxujtYPgyJ676yQ8jEm6zzaaWHFDg5BNcLuif0eD2MTyJdZqXpdg==}

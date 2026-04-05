@@ -12,7 +12,7 @@ pnpm install
 pnpm storybook
 ```
 
-Visit [http://localhost:6006](http://localhost:6006) to view the component library.
+Visit [http://localhost:6996](http://localhost:6996) to view the component library.
 
 ## VS Code Themes
 

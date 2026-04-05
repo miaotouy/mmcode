@@ -20,7 +20,7 @@
 		{
 			"label": "watch:pnpm",
 			"type": "shell",
-			"command": "npx",
+			"command": "bunx",
 			"args": [
 				"nodemon",
 				"--watch",
@@ -74,7 +74,7 @@
 			"label": "watch:bundle",
 			"dependsOn": ["watch:pnpm"],
 			"type": "shell",
-			"command": "npx turbo watch:bundle",
+			"command": "bunx turbo watch:bundle",
 			"group": "build",
 			"problemMatcher": {
 				"owner": "esbuild",
@@ -97,7 +97,7 @@
 			"label": "watch:tsc",
 			"dependsOn": ["watch:pnpm"],
 			"type": "shell",
-			"command": "npx turbo watch:tsc",
+			"command": "bunx turbo watch:tsc",
 			"group": "build",
 			"problemMatcher": "$tsc-watch",
 			"isBackground": true,
@@ -109,7 +109,7 @@
 		{
 			"label": "storybook",
 			"type": "shell",
-			"command": "kill -9 $(lsof -t -i tcp:6006) 2>/dev/null || true && npx turbo storybook",
+			"command": "kill -9 $(lsof -t -i tcp:6996) 2>/dev/null || true && bunx turbo storybook",
 			"group": "build",
 			"problemMatcher": {
 				"owner": "storybook",
@@ -119,7 +119,7 @@
 				"background": {
 					"activeOnStart": true,
 					"beginsPattern": ".*Storybook.*",
-					"endsPattern": ".*Local:.*http://localhost:6006.*"
+					"endsPattern": ".*Local:.*http://localhost:6996.*"
 				}
 			},
 			"isBackground": true,
