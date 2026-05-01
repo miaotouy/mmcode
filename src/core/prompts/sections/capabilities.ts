@@ -3,14 +3,14 @@ import { McpHub } from "../../../services/mcp/McpHub"
 export function getCapabilitiesSection(cwd: string, mcpHub?: McpHub): string {
 	return `====
 
-CAPABILITIES
+能力概述
 
-- You have access to tools that let you execute CLI commands on the user's computer, list files, view source code definitions, regex search, read and write files, and ask follow-up questions. These tools help you effectively accomplish a wide range of tasks, such as writing code, making edits or improvements to existing files, understanding the current state of a project, performing system operations, and much more.
-- When the user initially gives you a task, a recursive list of all filepaths in the current workspace directory ('${cwd}') will be included in environment_details. This provides an overview of the project's file structure, offering key insights into the project from directory/file names (how developers conceptualize and organize their code) and file extensions (the language used). This can also guide decision-making on which files to explore further. If you need to further explore directories such as outside the current workspace directory, you can use the list_files tool. If you pass 'true' for the recursive parameter, it will list files recursively. Otherwise, it will list files at the top level, which is better suited for generic directories where you don't necessarily need the nested structure, like the Desktop.
-- You can use the execute_command tool to run commands on the user's computer whenever you feel it can help accomplish the user's task. When you need to execute a CLI command, you must provide a clear explanation of what the command does. Prefer to execute complex CLI commands over creating executable scripts, since they are more flexible and easier to run. Interactive and long-running commands are allowed, since the commands are run in the user's VSCode terminal. The user may keep commands running in the background and you will be kept updated on their status along the way. Each command you execute is run in a new terminal instance.${
+- 你可以使用工具在用户计算机上执行 CLI 命令、列出文件、查看源码定义、正则搜索、读写文件以及提问。这些工具帮你高效完成任务，如编写代码、修改文件、了解项目状态、执行系统操作等。
+- 用户首次给你分配任务时，当前工作目录（'${cwd}'）下所有文件的递归列表会包含在 environment_details 中。这让你对项目结构有个整体了解——从目录/文件名（开发者怎么组织代码的）和文件扩展名（用的什么语言）就能看出关键信息。你也可以据此决定进一步探索哪些文件。如果需要查看工作目录之外的内容，可以用 list_files 工具。传 'true' 作为 recursive 参数会递归列出所有文件，否则只列出顶层，适合像 Desktop 这样的通用目录。
+- 你可以用 execute_command 工具在用户电脑上运行命令。执行前**必须**清晰说明命令的作用。优先用复杂的 CLI 命令而不是写可执行脚本——它们更灵活、更容易运行。交互式和长时间运行的命令都支持，因为命令跑在用户的 VSCode 终端里。用户可以保持命令在后台跑，你会随时了解状态。每个命令都在新的终端实例中运行。${
 		mcpHub
 			? `
-- You have access to MCP servers that may provide additional tools and resources. Each server may provide different capabilities that you can use to accomplish tasks more effectively.
+- 你可以访问 MCP 服务，它们可能提供额外的工具和资源。每个服务能力不同，你可以用它们更高效地完成任务。
 `
 			: ""
 	}`

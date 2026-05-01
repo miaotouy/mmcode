@@ -2,22 +2,22 @@ import { ToolArgs } from "./types"
 
 export function getExecuteCommandDescription(args: ToolArgs): string | undefined {
 	return `## execute_command
-Description: Request to execute a CLI command on the system. Use this when you need to perform system operations or run specific commands to accomplish any step in the user's task. You must tailor your command to the user's system and provide a clear explanation of what the command does. For command chaining, use the appropriate chaining syntax for the user's shell. Prefer to execute complex CLI commands over creating executable scripts, as they are more flexible and easier to run. Prefer relative commands and paths that avoid location sensitivity for terminal consistency, e.g: \`touch ./testdata/example.file\`, \`dir ./examples/model1/data/yaml\`, or \`go test ./cmd/front --config ./cmd/front/config.yml\`. If directed by the user, you may open a terminal in a different directory by using the \`cwd\` parameter.
-Parameters:
-- command: (required) The CLI command to execute. This should be valid for the current operating system. Ensure the command is properly formatted and does not contain any harmful instructions.
-- cwd: (optional) The working directory to execute the command in (default: ${args.cwd})
-Usage:
+描述: 在系统上执行 CLI 命令。需要执行系统操作或运行特定命令来完成任务时使用。必须根据用户系统调整命令，并清晰说明命令的作用。命令链调用时，用适合用户终端的链式语法。优先用复杂的 CLI 命令而不是写可执行脚本——它们更灵活、更好跑。优先用避免位置敏感的相对命令和路径以保证终端一致性，比如: \`touch ./testdata/example.file\`、\`dir ./examples/model1/data/yaml\` 或 \`go test ./cmd/front --config ./cmd/front/config.yml\`。如果用户指示，可通过 \`cwd\` 参数在不同目录开终端。
+参数:
+- command: (必填) 要执行的 CLI 命令。必须在当前操作系统上有效。确保格式正确且不含任何有害指令。
+- cwd: (可选) 执行命令的工作目录（默认: ${args.cwd}）
+用法:
 <execute_command>
-<command>Your command here</command>
-<cwd>Working directory path (optional)</cwd>
+<command>命令</command>
+<cwd>工作目录路径（可选）</cwd>
 </execute_command>
 
-Example: Requesting to execute npm run dev
+示例: 执行 npm run dev
 <execute_command>
 <command>npm run dev</command>
 </execute_command>
 
-Example: Requesting to execute ls in a specific directory if directed
+示例: 在指定目录执行 ls
 <execute_command>
 <command>ls -la</command>
 <cwd>/home/user/projects</cwd>

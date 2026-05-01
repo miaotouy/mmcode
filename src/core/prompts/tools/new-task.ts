@@ -4,22 +4,22 @@ import { ToolArgs } from "./types"
  * Prompt when todos are NOT required (default)
  */
 const PROMPT_WITHOUT_TODOS = `## new_task
-Description: This will let you create a new task instance in the chosen mode using your provided message.
+描述: 用提供的消息在选定模式下创建新的任务实例。
 
-Parameters:
-- mode: (required) The slug of the mode to start the new task in (e.g., "code", "debug", "architect").
-- message: (required) The initial user message or instructions for this new task.
+参数:
+- mode: (必填) 要启动新任务的模式标识（如 "code"、"debug"、"architect"）。
+- message: (必填) 此新任务的初始用户消息或指令。
 
-Usage:
+用法:
 <new_task>
-<mode>your-mode-slug-here</mode>
-<message>Your initial instructions here</message>
+<mode>模式标识</mode>
+<message>初始指令</message>
 </new_task>
 
-Example:
+示例:
 <new_task>
 <mode>code</mode>
-<message>Implement a new feature for the application</message>
+<message>为应用程序实现新功能</message>
 </new_task>
 `
 
@@ -27,33 +27,33 @@ Example:
  * Prompt when todos ARE required
  */
 const PROMPT_WITH_TODOS = `## new_task
-Description: This will let you create a new task instance in the chosen mode using your provided message and initial todo list.
+描述: 用提供的消息和初始待办列表在选定模式下创建新的任务实例。
 
-Parameters:
-- mode: (required) The slug of the mode to start the new task in (e.g., "code", "debug", "architect").
-- message: (required) The initial user message or instructions for this new task.
-- todos: (required) The initial todo list in markdown checklist format for the new task.
+参数:
+- mode: (必填) 要启动新任务的模式标识（如 "code"、"debug"、"architect"）。
+- message: (必填) 此新任务的初始用户消息或指令。
+- todos: (必填) 新任务的 Markdown 待办列表格式的初始待办事项。
 
-Usage:
+用法:
 <new_task>
-<mode>your-mode-slug-here</mode>
-<message>Your initial instructions here</message>
+<mode>模式标识</mode>
+<message>初始指令</message>
 <todos>
-[ ] First task to complete
-[ ] Second task to complete
-[ ] Third task to complete
+[ ] 第一个待办任务
+[ ] 第二个待办任务
+[ ] 第三个待办任务
 </todos>
 </new_task>
 
-Example:
+示例:
 <new_task>
 <mode>code</mode>
-<message>Implement user authentication</message>
+<message>实现用户认证</message>
 <todos>
-[ ] Set up auth middleware
-[ ] Create login endpoint
-[ ] Add session management
-[ ] Write tests
+[ ] 设置认证中间件
+[ ] 创建登录接口
+[ ] 添加会话管理
+[ ] 编写测试
 </todos>
 </new_task>
 

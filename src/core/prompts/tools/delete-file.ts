@@ -5,39 +5,38 @@ import { ToolArgs } from "./types"
 export function getDeleteFileDescription(args: ToolArgs): string {
 	return `## delete_file
 
-Delete a file or directory from the workspace. This tool provides a safe alternative to rm commands and works across all platforms.
+描述: 从工作空间删除文件或目录。是 rm 命令的安全替代方案，全平台支持。
 
-**Parameters:**
-- path (required): Relative path to the file or directory to delete
+**参数:**
+- path (必填): 要删除的文件或目录路径（相对于工作目录 ${args.cwd}）
 
-**Usage:**
-\`\`\`xml
+**用法:**
 <delete_file>
 <path>path/to/file.txt</path>
 </delete_file>
-\`\`\`
 
-**Safety Features:**
-- Only deletes files/directories within the workspace
-- Requires user confirmation before deletion
-- Prevents deletion of write-protected files
-- Validates all files against .kilocodeignore rules
-- For directories: scans recursively and shows statistics (file count, directory count, total size) before deletion
-- Blocks directory deletion if any contained file is protected or ignored
+**安全特性:**
+- 只在工作空间内删除文件/目录
+- 删除前需要用户确认
+- 阻止删写保护的文件
+- 按 .kilocodeignore 规则验证所有文件
+- 对目录：递归扫描并在删除前显示统计信息（文件数、目录数、总大小）
+- 如果包含受保护或被忽略的文件，阻止删除目录
 
-**Examples:**
+**示例:**
 
-Delete a single file:
+删除单个文件:
 \`\`\`xml
 <delete_file>
 <path>temp/old_file.txt</path>
 </delete_file>
 \`\`\`
 
-Delete a directory (requires approval with statistics):
+删除目录（需批准并显示统计）:
 \`\`\`xml
 <delete_file>
 <path>old_project/</path>
 </delete_file>
-\`\`\``
+\`\`\`
+`
 }

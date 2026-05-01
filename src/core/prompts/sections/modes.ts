@@ -17,9 +17,9 @@ export async function getModesSection(
 
 	let modesContent = `====
 
-MODES
+模式
 
-- These are the currently available modes:
+- 以下是当前可用的模式:
 ${allModes
 	.map((mode: ModeConfig) => {
 		let description: string
@@ -36,14 +36,14 @@ ${allModes
 
 	if (!skipXmlExamples) {
 		modesContent += `
-If the user asks you to create or edit a new mode for this project, you should read the instructions by using the fetch_instructions tool, like this:
+如果用户要求你为此项目创建或编辑新模式，用 fetch_instructions 工具获取说明:
 <fetch_instructions>
 <task>create_mode</task>
 </fetch_instructions>
 `
 	} else {
 		modesContent += `
-If the user asks you to create or edit a new mode for this project, you should read the instructions by using the fetch_instructions tool.
+如果用户要求你为此项目创建或编辑新模式，用 fetch_instructions 工具获取说明。
 `
 	}
 

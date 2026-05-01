@@ -12,12 +12,10 @@ export function getToolUseGuidelinesSection(
 	const guidelinesList: string[] = []
 
 	// First guideline is always the same
-	guidelinesList.push(
-		`${itemNumber++}. Assess what information you already have and what information you need to proceed with the task.`,
-	)
+	guidelinesList.push(`${itemNumber++}. 评估你已有的信息以及继续任务需要哪些信息。`)
 
 	guidelinesList.push(
-		`${itemNumber++}. Choose the most appropriate tool based on the task and the tool descriptions provided. Assess if you need additional information to proceed, and which of the available tools would be most effective for gathering this information. For example using the list_files tool is more effective than running a command like \`ls\` in the terminal. It's critical that you think about each available tool and use the one that best fits the current step in the task.`,
+		`${itemNumber++}. 根据任务和提供的工具描述选最合适的工具。评估是否需要更多信息才能继续，以及哪些工具对收集这些信息最有效。比如用 list_files 比运行 \`ls\` 更有效。关键是想清楚每个工具，选最适合当前步骤的那个。`,
 	)
 
 	// Remaining guidelines - different for native vs XML protocol
@@ -30,54 +28,54 @@ export function getToolUseGuidelinesSection(
 
 		if (isMultipleNativeToolCallsEnabled) {
 			guidelinesList.push(
-				`${itemNumber++}. If multiple actions are needed, you may use multiple tools in a single message when appropriate, or use tools iteratively across messages. Each tool use should be informed by the results of previous tool uses. Do not assume the outcome of any tool use. Each step must be informed by the previous step's result.`,
+				`${itemNumber++}. 如果需要多个操作，你可以在适当情况下在单条消息中用多个工具，也可以跨消息迭代使用工具。每次工具使用都应基于前一次的结果。不要假设任何工具使用的结果。每个步骤都必须基于上一步的结果。`,
 			)
 		} else {
 			guidelinesList.push(
-				`${itemNumber++}. If multiple actions are needed, use one tool at a time per message to accomplish the task iteratively, with each tool use being informed by the result of the previous tool use. Do not assume the outcome of any tool use. Each step must be informed by the previous step's result.`,
+				`${itemNumber++}. 如果需要多个操作，每轮消息只能用一个工具来迭代完成，每次工具使用都基于前一次的结果。不要假设任何工具使用的结果。每个步骤都必须基于上一步的结果。`,
 			)
 		}
 
 		guidelinesList.push(
-			`${itemNumber++}. CRITICAL: You must use the API's native tool format. Do NOT simply write text describing the tool use (e.g., "[Tool Use: ...]" or JSON blocks in text). The system will strictly reject any text that mimics a tool call. You must use the proper API structure for function calling.`,
+			`${itemNumber++}. 关键: 你必须使用 API 的原生工具格式。不要只是写描述工具使用的文本（如 "[Tool Use: ...]" 或文本中的 JSON 块）。系统会严格拒绝任何模拟工具调用的文本。你必须用正确的函数调用 API 结构。`,
 		)
 	} else {
 		guidelinesList.push(
-			`${itemNumber++}. If multiple actions are needed, use one tool at a time per message to accomplish the task iteratively, with each tool use being informed by the result of the previous tool use. Do not assume the outcome of any tool use. Each step must be informed by the previous step's result.`,
+			`${itemNumber++}. 如果需要多个操作，每轮消息只能用一个工具来迭代完成，每次工具使用都基于前一次的结果。不要假设任何工具使用的结果。每个步骤都必须基于上一步的结果。`,
 		)
 	}
 
 	// Protocol-specific guideline - only add for XML protocol
 	if (!isNativeProtocol(protocol)) {
-		guidelinesList.push(`${itemNumber++}. Formulate your tool use using the XML format specified for each tool.`)
+		guidelinesList.push(`${itemNumber++}. 使用为每个工具指定的 XML 格式来编写你的工具使用。`)
 	}
-	guidelinesList.push(`${itemNumber++}. After each tool use, the user will respond with the result of that tool use. This result will provide you with the necessary information to continue your task or make further decisions. This response may include:
-	 - Information about whether the tool succeeded or failed, along with any reasons for failure.
-	 - Linter errors that may have arisen due to the changes you made, which you'll need to address.
-	 - New terminal output in reaction to the changes, which you may need to consider or act upon.
-	 - Any other relevant feedback or information related to the tool use.`)
+	guidelinesList.push(`${itemNumber++}. 每次工具使用后，用户会回复该工具使用的结果。结果会告诉你继续任务或做决策所需的信息。回复可能包括:
+	 - 工具成功或失败的信息及其原因。
+	 - 因你的更改而产生的 lint 错误，你需要处理。
+	 - 对更改产生的新终端输出，你可能需要考虑或据此采取行动。
+	 - 与工具使用相关的任何其他反馈或信息。`)
 
 	// Only add the "wait for confirmation" guideline for XML protocol
 	// Native protocol allows multiple tools per message, so waiting after each tool doesn't apply
 	if (!isNativeProtocol(protocol)) {
 		guidelinesList.push(
-			`${itemNumber++}. ALWAYS wait for user confirmation after each tool use before proceeding. Never assume the success of a tool use without explicit confirmation of the result from the user.`,
+			`${itemNumber++}. 在继续之前，**始终**等待用户确认每次工具使用。没有用户明确确认结果的情况下，永远不要假设工具使用成功。`,
 		)
 	}
 
 	// Join guidelines and add the footer
 	// For native protocol, the footer is less relevant since multiple tools can execute in one message
 	const footer = isNativeProtocol(protocol)
-		? `\n\nBy carefully considering the user's response after tool executions, you can react accordingly and make informed decisions about how to proceed with the task. This iterative process helps ensure the overall success and accuracy of your work.`
-		: `\n\nIt is crucial to proceed step-by-step, waiting for the user's message after each tool use before moving forward with the task. This approach allows you to:
-1. Confirm the success of each step before proceeding.
-2. Address any issues or errors that arise immediately.
-3. Adapt your approach based on new information or unexpected results.
-4. Ensure that each action builds correctly on the previous ones.
+		? `\n\n通过仔细考虑工具执行后用户的回复，你可以相应地做出反应，做出明智的决策来推进任务。这种迭代过程有助于确保工作的整体成功和准确性。`
+		: `\n\n逐步进行，每次工具使用后等待用户的消息再继续前进，这一点至关重要。这种方法让你可以:
+1. 在继续前确认每个步骤的成功。
+2. 立即处理出现的任何问题或错误。
+3. 根据新信息或意外结果调整方法。
+4. 确保每个步骤都能正确建立在先前步骤的基础上。
 
-By waiting for and carefully considering the user's response after each tool use, you can react accordingly and make informed decisions about how to proceed with the task. This iterative process helps ensure the overall success and accuracy of your work.`
+通过在每次工具使用后等待并仔细考虑用户的回复，你可以相应地做出反应，做出明智的决策来推进任务。这种迭代过程有助于确保工作的整体成功和准确性。`
 
-	return `# Tool Use Guidelines
+	return `# 工具使用指南
 
 ${guidelinesList.join("\n")}${footer}`
 }

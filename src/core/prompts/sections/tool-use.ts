@@ -14,31 +14,31 @@ export function getSharedToolUseSection(
 		)
 
 		const toolUseGuidance = isMultipleNativeToolCallsEnabled
-			? " You must call at least one tool per assistant response. Prefer calling as many tools as are reasonably needed in a single response to reduce back-and-forth and complete tasks faster."
-			: " You must use exactly one tool call per assistant response. Do not call zero tools or more than one tool in the same response."
+			? " 每次助手回复必须至少调用一次工具。建议在单次回复中调用适当数量的工具以减少来回交互，更快完成任务。"
+			: " 每次助手回复必须且只能使用一次工具调用。不要在同一个回复中调用零次或多次工具。"
 
 		return `====
 
-TOOL USE
+工具使用
 
-You have access to a set of tools that are executed upon the user's approval. Use the provider-native tool-calling mechanism. Do not include XML markup or examples.${toolUseGuidance}`
+你有一组工具可在用户批准后执行。使用提供者的原生工具调用机制。不要包含 XML 标记或示例。${toolUseGuidance}`
 	}
 
 	return `====
 
-TOOL USE
+工具使用
 
-You have access to a set of tools that are executed upon the user's approval. You must use exactly one tool per message, and every assistant message must include a tool call. You use tools step-by-step to accomplish a given task, with each tool use informed by the result of the previous tool use.
+你有一组工具可在用户批准后执行。每轮消息必须且只能使用一个工具，每条助手消息必须包含一个工具调用。你逐步使用工具来完成任务，每次工具使用都基于前一次的结果。
 
-# Tool Use Formatting
+# 工具使用格式
 
-Tool uses are formatted using XML-style tags. The tool name itself becomes the XML tag name. Each parameter is enclosed within its own set of tags. Here's the structure:
+工具使用使用 XML 风格的标签进行格式化。工具名称本身成为 XML 标签名。每个参数都包含在自己的标签对中。格式如下:
 
-<actual_tool_name>
-<parameter1_name>value1</parameter1_name>
-<parameter2_name>value2</parameter2_name>
+<实际工具名称>
+<参数1名称>值1</参数1名称>
+<参数2名称>值2</参数2名称>
 ...
-</actual_tool_name>
+</实际工具名称>
 
-Always use the actual tool name as the XML tag name for proper parsing and execution.`
+始终使用实际工具名称作为 XML 标签名以确保正确解析和执行。`
 }

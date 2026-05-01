@@ -12,21 +12,21 @@ export function getFetchInstructionsDescription(enableMcpServerCreation?: boolea
 
 	const example =
 		enableMcpServerCreation !== false
-			? `Example: Requesting instructions to create an MCP Server
+			? `示例: 获取创建 MCP 服务的说明
 
 <fetch_instructions>
 <task>create_mcp_server</task>
 </fetch_instructions>`
-			: `Example: Requesting instructions to create a Mode
+			: `示例: 获取创建模式的说明
 
 <fetch_instructions>
 <task>create_mode</task>
 </fetch_instructions>`
 
 	return `## fetch_instructions
-Description: Request to fetch instructions to perform a task
-Parameters:
-- task: (required) The task to get instructions for.  This can take the following values:
+描述: 请求获取执行任务的说明
+参数:
+- task: (必填) 要获取说明的任务。可选值:
 ${tasks}
 
 ${example}`

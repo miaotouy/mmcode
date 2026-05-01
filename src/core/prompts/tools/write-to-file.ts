@@ -2,27 +2,27 @@ import { ToolArgs } from "./types"
 
 export function getWriteToFileDescription(args: ToolArgs): string {
 	return `## write_to_file
-Description: Request to write content to a file. This tool is primarily used for **creating new files** or for scenarios where a **complete rewrite of an existing file is intentionally required**. If the file exists, it will be overwritten. If it doesn't exist, it will be created. This tool will automatically create any directories needed to write the file.
+描述: 将内容写入文件。主要用于**创建新文件**或**有意完全重写已有文件**。文件已存在则覆盖，不存在则创建。会自动创建写入所需的目录。
 
-**Important:** You should prefer using other editing tools over write_to_file when making changes to existing files, since write_to_file is slower and cannot handle large files. Use write_to_file primarily for new file creation.
+**重要提示:** 改已有文件时优先用其他编辑工具而非 write_to_file，因为 write_to_file 慢且不能处理大文件。主要用于创建新文件。
 
-When using this tool, use it directly with the desired content. You do not need to display the content before using the tool. ALWAYS provide the COMPLETE file content in your response. This is NON-NEGOTIABLE. Partial updates or placeholders like '// rest of code unchanged' are STRICTLY FORBIDDEN. You MUST include ALL parts of the file, even if they haven't been modified. Failure to do so will result in incomplete or broken code.
+用此工具时直接写内容就行，不用先展示。**必须**在回复中提供**完整的**文件内容。**没商量。** 部分更新或占位符（如 '// rest of code unchanged'）**严格禁止**。没改的部分也**必须**全写上。否则代码会不完整或出问题。
 
-When creating a new project, organize all new files within a dedicated project directory unless the user specifies otherwise. Structure the project logically, adhering to best practices for the specific type of project being created.
+创建新项目时，除非用户另有指定，否则把所有新文件放在专用项目目录里。按所创建项目类型的最佳实践组织。
 
-Parameters:
-- path: (required) The path of the file to write to (relative to the current workspace directory ${args.cwd})
-- content: (required) The content to write to the file. ALWAYS provide the COMPLETE intended content of the file, without any truncation or omissions. You MUST include ALL parts of the file, even if they haven't been modified. Do NOT include line numbers in the content.
+参数:
+- path: (必填) 文件路径（相对于当前工作目录 ${args.cwd}）
+- content: (必填) 要写入的内容。**必须**提供文件的**完整**内容，不截断或省略。没改的部分也**必须**全写上。不要包含行号。
 
-Usage:
+用法:
 <write_to_file>
-<path>File path here</path>
+<path>文件路径</path>
 <content>
-Your file content here
+文件内容
 </content>
 </write_to_file>
 
-Example: Writing a configuration file
+示例: 写入配置文件
 <write_to_file>
 <path>frontend-config.json</path>
 <content>

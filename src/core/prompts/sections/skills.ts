@@ -42,54 +42,54 @@ export async function getSkillsSection(
 
 	return `====
 
-AVAILABLE SKILLS
+可用技能
 
 <available_skills>
 ${skillsXml}
 </available_skills>
 
 <mandatory_skill_check>
-REQUIRED PRECONDITION
+必需前置检查
 
-Before producing ANY user-facing response, you MUST perform a skill applicability check.
+在生成任何面向用户的回复之前，**必须**执行技能适用性检查。
 
-Step 1: Skill Evaluation
-- Evaluate the user's request against ALL available skill <description> entries in <available_skills>.
-- Determine whether at least one skill clearly and unambiguously applies.
+第 1 步: 技能评估
+- 对照 <available_skills> 中所有技能的 <description> 条目评估用户请求。
+- 确定是否至少有一个技能明确适用。
 
-Step 2: Branching Decision
+第 2 步: 分支决策
 
 <if_skill_applies>
-- Select EXACTLY ONE skill.
-- Prefer the most specific skill when multiple skills match.
-- Read the full SKILL.md file at the skill's <location>.
-- Load the SKILL.md contents fully into context BEFORE continuing.
-- Follow the SKILL.md instructions precisely.
-- Do NOT respond outside the skill-defined flow.
+- **只选一个技能。**
+- 多个技能匹配时，优先选最具体的。
+- 读取技能 <location> 处的完整 SKILL.md 文件。
+- 继续之前把 SKILL.md 内容完全加载到上下文中。
+- 精确遵循 SKILL.md 的指令。
+- 不要在技能定义的流程之外回复。
 </if_skill_applies>
 
 <if_no_skill_applies>
-- Proceed with a normal response.
-- Do NOT load any SKILL.md files.
+- 正常回复。
+- 不要加载任何 SKILL.md 文件。
 </if_no_skill_applies>
 
-CONSTRAINTS:
-- Do NOT load every SKILL.md up front.
-- Load SKILL.md ONLY after a skill is selected.
-- Do NOT skip this check.
-- FAILURE to perform this check is an error.
+约束:
+- 不要预先加载每个 SKILL.md。
+- 只在技能选定后加载。
+- 不要跳过此检查。
+- **没执行此检查算错误。**
 </mandatory_skill_check>
 
 <context_notes>
-- The skill list is already filtered for the current mode: "${currentMode}".
-- Mode-specific skills may come from skills-${currentMode}/ (in .kilocode/ or .claude/) with project-level overrides taking precedence over global skills.
+- 技能列表已按当前模式 "${currentMode}" 过滤。
+- 特定模式的技能可能来自 skills-${currentMode}/（在 .kilocode/ 或 .claude/ 目录下），项目级覆盖优先于全局技能。
 </context_notes>
 
 <internal_verification>
-This section is for internal control only.
-Do NOT include this section in user-facing output.
+此部分仅供内部控制用。
+不要在面向用户的输出中包含此部分。
 
-After completing the evaluation, internally confirm:
+完成评估后，内部确认:
 <skill_check_completed>true|false</skill_check_completed>
 </internal_verification>
 `

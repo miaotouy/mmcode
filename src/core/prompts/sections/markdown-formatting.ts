@@ -1,7 +1,7 @@
 export function markdownFormattingSection(): string {
 	return `====
 
-MARKDOWN RULES
+MARKDOWN 规则
 
-ALL responses MUST show ANY \`language construct\` OR filename reference as clickable, exactly as [\`filename OR language.declaration()\`](relative/file/path.ext:line); line is required for \`syntax\` and optional for filename links. This applies to ALL markdown responses and ALSO those in attempt_completion`
+所有回复**必须**将任何 \`代码语法\` 或文件名引用显示为可点击链接，格式 [\`文件名 或 函数声明()\`](相对/文件/路径.ext:行号)；\`语法\` 必须带行号，文件名链接行号可选。适用于所有 Markdown 回复及 attempt_completion 中的内容。`
 }

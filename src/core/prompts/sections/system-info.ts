@@ -17,14 +17,14 @@ export function getSystemInfoSection(cwd: string): string {
 
 	let details = `====
 
-SYSTEM INFORMATION
+系统信息
 
-Operating System: ${osInfo}
-Default Shell: ${getShell()}
-Home Directory: ${os.homedir().toPosix()}
-Current Workspace Directory: ${cwd.toPosix()}
+操作系统: ${osInfo}
+默认终端: ${getShell()}
+用户目录: ${os.homedir().toPosix()}
+当前工作目录: ${cwd.toPosix()}
 
-The Current Workspace Directory is the active VS Code project directory, and is therefore the default directory for all tool operations. New terminals will be created in the current workspace directory, however if you change directories in a terminal it will then have a different working directory; changing directories in a terminal does not modify the workspace directory, because you do not have access to change the workspace directory. When the user initially gives you a task, a recursive list of all filepaths in the current workspace directory ('/test/path') will be included in environment_details. This provides an overview of the project's file structure, offering key insights into the project from directory/file names (how developers conceptualize and organize their code) and file extensions (the language used). This can also guide decision-making on which files to explore further. If you need to further explore directories such as outside the current workspace directory, you can use the list_files tool. If you pass 'true' for the recursive parameter, it will list files recursively. Otherwise, it will list files at the top level, which is better suited for generic directories where you don't necessarily need the nested structure, like the Desktop.`
+当前工作目录是活动的 VS Code 项目目录，也是所有工具操作的默认目录。新终端会在当前工作目录中创建，但如果你在终端里切换了目录，它就会有不同工作目录；切换终端目录不会修改工作目录，因为你不能改工作目录。当用户首次给你分配任务时，当前工作目录（'/test/path'）下所有文件的递归列表会包含在 environment_details 中。这让你对项目结构有个整体了解——从目录/文件名（开发者怎么组织代码的）和文件扩展名（用的什么语言）就能看出关键信息。你也可以据此决定进一步探索哪些文件。如果需要查看工作目录之外的内容，可以用 list_files 工具。传 'true' 作为 recursive 参数会递归列出所有文件，否则只列出顶层，适合像 Desktop 这样的通用目录。`
 
 	return details
 }

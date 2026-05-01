@@ -1,18 +1,18 @@
 export function getSwitchModeDescription(): string {
 	return `## switch_mode
-Description: Request to switch to a different mode. This tool allows modes to request switching to another mode when needed, such as switching to Code mode to make code changes. The user must approve the mode switch.
-Parameters:
-- mode_slug: (required) The slug of the mode to switch to (e.g., "code", "ask", "architect")
-- reason: (optional) The reason for switching modes
-Usage:
+描述: 请求切换到不同模式。允许模式在需要时切换到另一个模式，比如切到代码模式改代码。用户必须批准切换。
+参数:
+- mode_slug: (必填) 要切换到的模式标识（如 "code"、"ask"、"architect"）
+- reason: (可选) 切换模式的原因
+用法:
 <switch_mode>
-<mode_slug>Mode slug here</mode_slug>
-<reason>Reason for switching here</reason>
+<mode_slug>模式标识</mode_slug>
+<reason>切换原因</reason>
 </switch_mode>
 
-Example: Requesting to switch to code mode
+示例: 请求切换到代码模式
 <switch_mode>
 <mode_slug>code</mode_slug>
-<reason>Need to make code changes</reason>
+<reason>需要修改代码</reason>
 </switch_mode>`
 }

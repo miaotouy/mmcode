@@ -6,71 +6,71 @@ import { ToolArgs } from "./types"
 export function getUpdateTodoListDescription(args?: ToolArgs): string {
 	return `## update_todo_list
 
-**Description:**
-Replace the entire TODO list with an updated checklist reflecting the current state. Always provide the full list; the system will overwrite the previous one. This tool is designed for step-by-step task tracking, allowing you to confirm completion of each step before updating, update multiple task statuses at once (e.g., mark one as completed and start the next), and dynamically add new todos discovered during long or complex tasks.
+**描述:**
+用反映当前状态的更新后的清单替换整个待办列表。始终提供完整列表；系统将覆盖之前的列表。此工具专为逐步任务跟踪而设计，允许在更新前确认每个步骤的完成情况，一次性更新多个任务状态（如标记一个任务为已完成并开始下一个），以及在长时间或复杂任务中动态添加新发现的待办事项。
 
-**Checklist Format:**
-- Use a single-level markdown checklist (no nesting or subtasks).
-- List todos in the intended execution order.
-- Status options:
-	 - [ ] Task description (pending)
-	 - [x] Task description (completed)
-	 - [-] Task description (in progress)
+**清单格式:**
+- 使用单级 Markdown 清单（无嵌套或子任务）。
+- 按预期执行顺序列出待办事项。
+- 状态选项:
+\t - [ ] 待办事项描述（未开始）
+\t - [x] 待办事项描述（已完成）
+\t - [-] 待办事项描述（进行中）
 
-**Status Rules:**
-- [ ] = pending (not started)
-- [x] = completed (fully finished, no unresolved issues)
-- [-] = in_progress (currently being worked on)
+**状态规则:**
+- [ ] = 未开始（尚未开始）
+- [x] = 已完成（完全结束，无未解决问题）
+- [-] = 进行中（当前正在处理）
 
-**Core Principles:**
-- Before updating, always confirm which todos have been completed since the last update.
-- You may update multiple statuses in a single update (e.g., mark the previous as completed and the next as in progress).
-- When a new actionable item is discovered during a long or complex task, add it to the todo list immediately.
-- Do not remove any unfinished todos unless explicitly instructed.
-- Always retain all unfinished tasks, updating their status as needed.
-- Only mark a task as completed when it is fully accomplished (no partials, no unresolved dependencies).
-- If a task is blocked, keep it as in_progress and add a new todo describing what needs to be resolved.
-- Remove tasks only if they are no longer relevant or if the user requests deletion.
+**核心原则:**
+- 更新前，始终确认自上次更新以来哪些待办事项已完成。
+- 可以在一次更新中更新多个状态（如将上一个标记为已完成，下一个标记为进行中）。
+- 在长时间或复杂任务中发现新的可操作事项时，立即添加到待办列表。
+- 除非明确指示，否则不要移除任何未完成的待办事项。
+- 始终保留所有未完成的任务，根据需要更新其状态。
+- 仅在任务完全完成时标记为已完成（无部分完成、无未解决的依赖项）。
+- 如果任务受阻，保持为进行中状态，并添加描述需要解决什么的新待办事项。
+- 仅当任务不再相关或用户请求删除时才移除任务。
 
-**Usage Example:**
+**用法示例:**
 <update_todo_list>
 <todos>
-[x] Analyze requirements
-[x] Design architecture
-[-] Implement core logic
-[ ] Write tests
-[ ] Update documentation
+[x] 分析需求
+[x] 设计架构
+[-] 实现核心逻辑
+[ ] 编写测试
+[ ] 更新文档
 </todos>
 </update_todo_list>
 
-*After completing "Implement core logic" and starting "Write tests":*
+*完成"实现核心逻辑"并开始"编写测试"后:*
 <update_todo_list>
 <todos>
-[x] Analyze requirements
-[x] Design architecture
-[x] Implement core logic
-[-] Write tests
-[ ] Update documentation
-[ ] Add performance benchmarks
+[x] 分析需求
+[x] 设计架构
+[x] 实现核心逻辑
+[-] 编写测试
+[ ] 更新文档
+[ ] 添加性能基准测试
 </todos>
 </update_todo_list>
 
-**When to Use:**
-- The task is complicated or involves multiple steps or requires ongoing tracking.
-- You need to update the status of several todos at once.
-- New actionable items are discovered during task execution.
-- The user requests a todo list or provides multiple tasks.
-- The task is complex and benefits from clear, stepwise progress tracking.
+**何时使用:**
+- 任务复杂或涉及多个步骤，或需要持续跟踪。
+- 需要一次性更新多个待办事项的状态。
+- 任务执行过程中发现新的可操作事项。
+- 用户请求待办列表或提供多个任务。
+- 任务复杂且受益于清晰的逐步进度跟踪。
 
-**When NOT to Use:**
-- There is only a single, trivial task.
-- The task can be completed in one or two simple steps.
-- The request is purely conversational or informational.
+**何时不使用:**
+- 只有一个简单的单一任务。
+- 任务可以在一两步简单步骤中完成。
+- 请求纯粹是对话性或信息性的。
 
-**Task Management Guidelines:**
-- Mark task as completed immediately after all work of the current task is done.
-- Start the next task by marking it as in_progress.
-- Add new todos as soon as they are identified.
-- Use clear, descriptive task names.
+**任务管理指南:**
+- 当前任务的所有工作完成后立即标记为已完成。
+- 通过标记为进行中开始下一个任务。
+- 发现新待办事项后立即添加。
+- 使用清晰、描述性的任务名称。
 `
 }

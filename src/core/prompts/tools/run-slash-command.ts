@@ -3,30 +3,30 @@
  */
 export function getRunSlashCommandDescription(): string {
 	return `## run_slash_command
-Description: Execute a slash command to get specific instructions or content. Slash commands are predefined templates that provide detailed guidance for common tasks.
+描述: 执行斜杠命令以获取特定指令或内容。斜杠命令是预定义的模板，为常见任务提供详细指导。
 
-Parameters:
-- command: (required) The name of the slash command to execute (e.g., "init", "test", "deploy")
-- args: (optional) Additional arguments or context to pass to the command
+参数:
+- command: (必填) 要执行的斜杠命令名称（如 "init"、"test"、"deploy"）
+- args: (可选) 传递给命令的附加参数或上下文
 
-Usage:
+用法:
 <run_slash_command>
-<command>command_name</command>
-<args>optional arguments</args>
+<command>命令名称</command>
+<args>可选参数</args>
 </run_slash_command>
 
-Examples:
+示例:
 
-1. Running the init command to analyze a codebase:
+1. 运行 init 命令分析代码库:
 <run_slash_command>
 <command>init</command>
 </run_slash_command>
 
-2. Running a command with additional context:
+2. 运行带有附加上下文的命令:
 <run_slash_command>
 <command>test</command>
-<args>focus on integration tests</args>
+<args>关注集成测试</args>
 </run_slash_command>
 
-The command content will be returned for you to execute or follow as instructions.`
+命令内容会返回给你执行或作为指令遵循。`
 }

@@ -1,52 +1,52 @@
 // kilocode_change: Morph fast apply - file added
 
 export function getFastApplyEditingInstructions(modelType: "Morph" | "Relace"): string {
-	return `- **${modelType} FastApply is enabled.** You have access to the \`fast_edit_file\` tool which uses a specialized model optimized for intelligent code understanding and modification.
-- **ONLY use the fast_edit_file tool for file modifications.**
-- **Focus on clear instructions and precise code edits** using the fast_edit_file format with \`// ... existing code ...\` placeholders to represent unchanged sections.
-- **The fast_edit_file tool requires three parameters:**
-   - \`target_file\`: Full path to the file to modify
-   - \`instructions\`: Single sentence describing what you're doing (use first person)
-   - \`code_edit\`: Only the lines you want to change, using \`// ... existing code ...\` for unchanged sections
-- **Always make all edits to a file in a single fast_edit_file call** rather than multiple calls to the same file.`
+	return `- **${modelType} FastApply 已启用。** 你可以使用 \`fast_edit_file\` 工具，该工具使用专门优化的模型进行智能代码理解和修改。
+- **仅使用 fast_edit_file 工具进行文件修改。**
+- **专注于清晰的指令和精确的代码编辑**，使用 fast_edit_file 格式，以 \`// ... existing code ...\` 占位符表示未更改的部分。
+- **fast_edit_file 工具需要三个参数:**
+   - \`target_file\`: 要修改文件的完整路径
+   - \`instructions\`: 用一句话描述你要做什么（使用第一人称）
+   - \`code_edit\`: 仅包含你要更改的行，未更改部分使用 \`// ... existing code ...\`
+- **始终将对同一文件的所有编辑放在单个 fast_edit_file 调用中**，而不是多次调用同一文件。`
 }
 
 export function getFastEditFileDescription(): string {
 	return `## fast_edit_file
 
-**Description**: Use this tool to make an edit to a file.
+**描述**: 使用此工具对文件进行编辑。
 
-This will be read by a less intelligent model, which will quickly apply the edit. You should make it clear what the edit is, while also minimizing the unchanged code you write.
+此内容将由一个较简单的模型读取，它将快速应用编辑。你应该清楚地描述编辑内容，同时尽量减少写出的未更改代码。
 
-When writing the edit, you should specify each edit in sequence, with the special comment \`// ... existing code ...\` to represent unchanged code in between edited lines.
+编写编辑时，应按顺序指定每次编辑，使用特殊注释 \`// ... existing code ...\` 表示编辑行之间的未更改代码。
 
-**Example Format**:
+**示例格式**:
 \`\`\`
 // ... existing code ...
-FIRST_EDIT
+第一次编辑
 // ... existing code ...
-SECOND_EDIT
+第二次编辑
 // ... existing code ...
-THIRD_EDIT
+第三次编辑
 // ... existing code ...
 \`\`\`
 
-You should still bias towards repeating as few lines of the original file as possible to convey the change.
-But, each edit should contain sufficient context of unchanged lines around the code you're editing to resolve ambiguity.
-DO NOT omit spans of pre-existing code (or comments) without using the \`// ... existing code ...\` comment to indicate its absence. If you omit the existing code comment, the model may inadvertently delete these lines.
-If you plan on deleting a section, you must provide context before and after to delete it. If the initial code is \`\`\`code \\n Block 1 \\n Block 2 \\n Block 3 \\n code\`\`\`, and you want to remove Block 2, you would output \`\`\`// ... existing code ... \\n Block 1 \\n  Block 3 \\n // ... existing code ...\`\`\`.
-Make sure it is clear what the edit should be, and where it should be applied.
-ALWAYS make all edits to a file in a single fast_edit_file instead of multiple fast_edit_file calls to the same file. The apply model can handle many distinct edits at once.
+仍应尽量少重复原始文件中的行来传达更改内容。
+但每次编辑应在编辑代码周围包含足够的未更改行上下文，以消除歧义。
+**不要** 在未使用 \`// ... existing code ...\` 注释表示省略的情况下，删除原有代码（或注释）的段落。如果省略现有代码注释，模型可能会意外删除这些行。
+如果要删除某个段落，必须在删除前后提供上下文。如果初始代码是 \`\`\`code \\n 块 1 \\n 块 2 \\n 块 3 \\n code\`\`\`，且要删除块 2，应输出 \`\`\`// ... existing code ... \\n 块 1 \\n  块 3 \\n // ... existing code ...\`\`\`。
+确保清楚地说明编辑内容及其应用位置。
+**始终** 将对同一文件的所有编辑放在单个 fast_edit_file 中，而不是多次调用同一文件。应用模型可以同时处理多个不同的编辑。
 
-**REQUIRED Parameters**:
+**必填参数**:
 
-1. **target_file** (string): The target file to modify. Always specify the full path to the file you want to edit.
+1. **target_file** (字符串): 要修改的目标文件。始终指定要编辑文件的完整路径。
 
-2. **instructions** (string): A single sentence instruction describing what you are going to do for the sketched edit. This is used to assist the less intelligent model in applying the edit. Use the first person to describe what you are going to do. Use it to disambiguate uncertainty in the edit.
+2. **instructions** (字符串): 用一句话描述你要对草图编辑做的事情。用于辅助较简单的模型应用编辑。使用第一人称描述你要做什么。用于消除编辑中的不确定性。
 
-3. **code_edit** (string): Specify ONLY the precise lines of code that you wish to edit. NEVER specify or write out unchanged code. Instead, represent all unchanged code using the comment of the language you're editing in - example: \`// ... existing code ...\`
+3. **code_edit** (字符串): 仅指定要编辑的精确代码行。**永远不要** 指定或写出未更改的代码。相反，使用正在编辑的语言的注释表示所有未更改代码 - 示例: \`// ... existing code ...\`
 
-**ALL THREE PARAMETERS (target_file, instructions, code_edit) ARE MANDATORY**`
+**所有三个参数 (target_file, instructions, code_edit) 均为必填**`
 }
 
 // kilocode_change: Backward-compatible export name
