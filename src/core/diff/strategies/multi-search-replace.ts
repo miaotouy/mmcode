@@ -92,33 +92,33 @@ export class MultiSearchReplaceDiffStrategy implements DiffStrategy {
 
 	getToolDescription(args: { cwd: string; toolOptions?: { [key: string]: string } }): string {
 		return `## apply_diff
-Description: Request to apply PRECISE, TARGETED modifications to an existing file by searching for specific sections of content and replacing them. This tool is for SURGICAL EDITS ONLY - specific changes to existing code.
-You can perform multiple distinct search and replace operations within a single \`apply_diff\` call by providing multiple SEARCH/REPLACE blocks in the \`diff\` parameter. This is the preferred way to make several targeted changes efficiently.
-The SEARCH section must exactly match existing content including whitespace and indentation.
-If you're not confident in the exact content to search for, use the read_file tool first to get the exact content.
-When applying the diffs, be extra careful to remember to change any closing brackets or other syntax that may be affected by the diff farther down in the file.
-ALWAYS make as many changes in a single 'apply_diff' request as possible using multiple SEARCH/REPLACE blocks
+描述: 请求通过搜索特定内容区域并进行替换，对现有文件进行精确、有针对性的修改。此工具仅用于精确编辑（Surgical Edits）——对现有代码进行特定更改。
+你可以通过在 \`diff\` 参数中提供多个 SEARCH/REPLACE 块，在单个 \`apply_diff\` 调用中执行多个不同的搜索和替换操作。这是高效进行多处针对性更改的首选方式。
+SEARCH 部分必须与现有内容（包括空格 and 缩进）完全匹配。
+如果你不确定要搜索的确切内容，请先使用 read_file 工具获取确切内容。
+在应用差异更新时，请务必格外小心，记住更改可能受文件下方差异更新影响的任何闭合括号或其他语法。
+始终尽可能在单个 'apply_diff' 请求中，使用多个 SEARCH/REPLACE 块进行尽可能多的更改。
 
-Parameters:
-- path: (required) The path of the file to modify (relative to the current workspace directory ${args.cwd})
-- diff: (required) The search/replace block defining the changes.
+参数:
+- path: (必填) 要修改的文件路径（相对于当前工作目录 ${args.cwd}）
+- diff: (必填) 定义更改的 search/replace 块。
 
-Diff format:
+差异更新格式:
 \`\`\`
 <<<<<<< SEARCH
-:start_line: (required) The line number of original content where the search block starts.
+:start_line: (必填) 搜索块开始的原始内容行号。
 -------
-[exact content to find including whitespace]
+[要查找的确切内容，包括空格和缩进]
 =======
-[new content to replace with]
+[要替换的新内容]
 >>>>>>> REPLACE
 
 \`\`\`
 
 
-Example:
+示例:
 
-Original file:
+原始文件:
 \`\`\`
 1 | def calculate_total(items):
 2 |     total = 0
@@ -127,7 +127,7 @@ Original file:
 5 |     return total
 \`\`\`
 
-Search/Replace content:
+搜索/替换内容:
 \`\`\`
 <<<<<<< SEARCH
 :start_line:1
@@ -139,13 +139,13 @@ def calculate_total(items):
     return total
 =======
 def calculate_total(items):
-    """Calculate total with 10% markup"""
+    """计算带10%加价的总额"""
     return sum(item * 1.1 for item in items)
 >>>>>>> REPLACE
 
 \`\`\`
 
-Search/Replace content with multiple edits:
+包含多处修改的搜索/替换内容:
 \`\`\`
 <<<<<<< SEARCH
 :start_line:1
@@ -169,13 +169,13 @@ def calculate_sum(items):
 \`\`\`
 
 
-Usage:
+用法:
 <apply_diff>
-<path>File path here</path>
+<path>此处填写文件路径</path>
 <diff>
-Your search/replace content here
-You can use multi search/replace block in one diff block, but make sure to include the line numbers for each block.
-Only use a single line of '=======' between search and replacement content, because multiple '=======' will corrupt the file.
+在此处填写你的搜索/替换内容
+你可以在一个 diff 块中使用多个搜索/替换块，但请务必为每个块包含行号。
+在搜索和替换内容之间只能使用单行 '======='，多行 '=======' 会损坏文件。
 </diff>
 </apply_diff>`
 	}
