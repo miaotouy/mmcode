@@ -1,0 +1,22 @@
+{
+	"$schema": "https://raw.githubusercontent.com/oxc-project/oxc/main/npm/oxlint/configuration_schema.json",
+	"categories": {
+		"correctness": "warn",
+		"suspicious": "off",
+		"pedantic": "off",
+		"perf": "off",
+		"restriction": "off",
+		"style": "off",
+		"nursery": "off"
+	},
+	"rules": {
+		"eslint/no-unused-vars": "off",
+		"eslint/no-undef": "off",
+		"eslint/no-control-regex": "off",
+		"eslint/no-useless-escape": "off",
+		"typescript/no-unused-vars": "off",
+		"typescript/no-explicit-any": "off",
+		"typescript/no-require-imports": "off",
+		"typescript/no-var-requires": "off"
+	}
+}

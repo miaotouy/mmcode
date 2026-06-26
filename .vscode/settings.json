@@ -17,12 +17,13 @@
 		"jetbrains/host/deps/**": true
 	},
 	// Turn off tsc task auto detection since we have the necessary tasks as npm scripts
-	"typescript.tsc.autoDetect": "off",
+	"js/ts.tsc.autoDetect": "off",
 	"i18n-ally.localesPaths": ["webview-ui/src/i18n", "webview-ui/src/__mocks__/i18n", "webview-ui/src/i18n/locales"],
 	"vitest.disableWorkspaceWarning": true,
 	"markdown.editor.filePaste.copyIntoWorkspace": "mediaFiles",
 	"markdown.copyFiles.destination": {
 		"**/*": "/static/img/${documentBaseName}/${documentBaseName}.${fileName/(.*)\\.(.*)/$2/}"
 	},
-	"java.configuration.updateBuildConfiguration": "interactive"
+	"java.configuration.updateBuildConfiguration": "interactive",
+	"oxc.config": "oxlintrc.json"
 }
