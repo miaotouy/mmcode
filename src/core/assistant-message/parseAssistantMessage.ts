@@ -1,6 +1,9 @@
 import { type ToolName, toolNames } from "@roo-code/types"
 
 import { TextContent, ToolUse, McpToolUse, ToolParamName, toolParamNames } from "../../shared/tools"
+// kilocode_change start
+import { normalizeToolParamValue } from "./xmlCdata"
+// kilocode_change end
 
 export type AssistantMessageContent = TextContent | ToolUse | McpToolUse
 
@@ -37,10 +40,9 @@ export function parseAssistantMessage(assistantMessage: string): AssistantMessag
 				}
 				// kilocode_change end
 
-				currentToolUse.params[currentParamName] =
-					currentParamName === "content"
-						? paramValue.replace(/^\n/, "").replace(/\n$/, "")
-						: paramValue.trim()
+				// kilocode_change start
+				currentToolUse.params[currentParamName] = normalizeToolParamValue(currentParamName, paramValue)
+				// kilocode_change end
 				currentParamName = undefined
 				continue
 			} else {
@@ -91,10 +93,12 @@ export function parseAssistantMessage(assistantMessage: string): AssistantMessag
 
 					if (contentStartIndex !== -1 && contentEndIndex !== -1 && contentEndIndex > contentStartIndex) {
 						// Don't trim content to preserve newlines, but strip first and last newline only
-						currentToolUse.params[contentParamName] = toolContent
-							.slice(contentStartIndex, contentEndIndex)
-							.replace(/^\n/, "")
-							.replace(/\n$/, "")
+						// kilocode_change start
+						currentToolUse.params[contentParamName] = normalizeToolParamValue(
+							contentParamName,
+							toolContent.slice(contentStartIndex, contentEndIndex),
+						)
+						// kilocode_change end
 					}
 				}
 
@@ -160,8 +164,9 @@ export function parseAssistantMessage(assistantMessage: string): AssistantMessag
 			// Tool call has a parameter that was not completed.
 			// Don't trim content parameters to preserve newlines, but strip first and last newline only
 			const paramValue = accumulator.slice(currentParamValueStartIndex)
-			currentToolUse.params[currentParamName] =
-				currentParamName === "content" ? paramValue.replace(/^\n/, "").replace(/\n$/, "") : paramValue.trim()
+			// kilocode_change start
+			currentToolUse.params[currentParamName] = normalizeToolParamValue(currentParamName, paramValue)
+			// kilocode_change end
 		}
 
 		contentBlocks.push(currentToolUse)

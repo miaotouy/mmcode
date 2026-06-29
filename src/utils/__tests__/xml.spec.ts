@@ -236,5 +236,34 @@ describe("parseXmlForDiff", () => {
 			// The & should remain as-is for exact matching with file content
 			expect(result.args.file.diff.content).toBe("Team Identity & Project Positioning")
 		})
+
+		it("should unwrap CDATA in stopped diff content nodes", () => {
+			const xml = `
+        <args>
+          <file>
+            <path>./doc.md</path>
+            <diff>
+              <content><![CDATA[
+<<<<<<< SEARCH
+old
+=======
+new
+>>>>>>> REPLACE
+]]></content>
+            </diff>
+          </file>
+        </args>
+      `
+
+			const result = parseXmlForDiff(xml, ["file.diff.content"]) as any
+
+			expect(result.args.file.diff.content).not.toContain("<![CDATA[")
+			expect(result.args.file.diff.content).not.toContain("]]>")
+			expect(result.args.file.diff.content.trim()).toBe(`<<<<<<< SEARCH
+old
+=======
+new
+>>>>>>> REPLACE`)
+		})
 	})
 })

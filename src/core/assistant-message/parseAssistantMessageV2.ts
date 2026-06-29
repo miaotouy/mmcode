@@ -1,6 +1,9 @@
 import { type ToolName, toolNames } from "@roo-code/types"
 
 import { TextContent, ToolUse, ToolParamName, toolParamNames } from "../../shared/tools"
+// kilocode_change start
+import { normalizeToolParamValue } from "./xmlCdata"
+// kilocode_change end
 
 export type AssistantMessageContent = TextContent | ToolUse
 
@@ -80,9 +83,9 @@ export function parseAssistantMessageV2(assistantMessage: string): AssistantMess
 					currentParamValueStart, // Start after the opening tag.
 					currentCharIndex - closeTag.length + 1, // End before the closing tag.
 				)
-				// Don't trim content parameters to preserve newlines, but strip first and last newline only
-				currentToolUse.params[currentParamName] =
-					currentParamName === "content" ? value.replace(/^\n/, "").replace(/\n$/, "") : value.trim()
+				// kilocode_change start
+				currentToolUse.params[currentParamName] = normalizeToolParamValue(currentParamName, value)
+				// kilocode_change end
 				currentParamName = undefined // Go back to parsing tool content.
 				// We don't continue loop here, need to check for tool close or other params at index i.
 			} else {
@@ -146,12 +149,12 @@ export function parseAssistantMessageV2(assistantMessage: string): AssistantMess
 					const contentEnd = toolContentSlice.lastIndexOf(contentEndTag)
 
 					if (contentStart !== -1 && contentEnd !== -1 && contentEnd > contentStart) {
-						// Don't trim content to preserve newlines, but strip first and last newline only
-						const contentValue = toolContentSlice
-							.slice(contentStart + contentStartTag.length, contentEnd)
-							.replace(/^\n/, "")
-							.replace(/\n$/, "")
-						currentToolUse.params[contentParamName] = contentValue
+						// kilocode_change start
+						currentToolUse.params[contentParamName] = normalizeToolParamValue(
+							contentParamName,
+							toolContentSlice.slice(contentStart + contentStartTag.length, contentEnd),
+						)
+						// kilocode_change end
 					}
 				}
 
@@ -253,9 +256,9 @@ export function parseAssistantMessageV2(assistantMessage: string): AssistantMess
 	// Finalize any open parameter within an open tool use.
 	if (currentToolUse && currentParamName) {
 		const value = assistantMessage.slice(currentParamValueStart) // From param start to end of string.
-		// Don't trim content parameters to preserve newlines, but strip first and last newline only
-		currentToolUse.params[currentParamName] =
-			currentParamName === "content" ? value.replace(/^\n/, "").replace(/\n$/, "") : value.trim()
+		// kilocode_change start
+		currentToolUse.params[currentParamName] = normalizeToolParamValue(currentParamName, value)
+		// kilocode_change end
 		// Tool use remains partial.
 	}
 

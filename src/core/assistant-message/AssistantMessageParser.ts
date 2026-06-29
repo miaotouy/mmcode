@@ -1,6 +1,9 @@
 import { type ToolName, toolNames } from "@roo-code/types"
 import { TextContent, ToolUse, ToolParamName, toolParamNames } from "../../shared/tools"
 import { AssistantMessageContent } from "./parseAssistantMessage"
+// kilocode_change start
+import { normalizeToolParamValue } from "./xmlCdata"
+// kilocode_change end
 
 /**
  * Parser for assistant messages. Maintains state between chunks
@@ -77,19 +80,24 @@ export class AssistantMessageParser {
 				const paramClosingTag = `</${this.currentParamName}>`
 				// Streamed param content: always write the currently accumulated value
 				if (currentParamValue.endsWith(paramClosingTag)) {
-					// End of param value.
-					// Do not trim content parameters to preserve newlines, but strip first and last newline only
 					const paramValue = currentParamValue.slice(0, -paramClosingTag.length)
-					this.currentToolUse.params[this.currentParamName] =
-						this.currentParamName === "content"
-							? paramValue.replace(/^\n/, "").replace(/\n$/, "")
-							: paramValue.trim()
+					// kilocode_change start
+					this.currentToolUse.params[this.currentParamName] = normalizeToolParamValue(
+						this.currentParamName,
+						paramValue,
+					)
+					// kilocode_change end
 					this.currentParamName = undefined
 					continue
 				} else {
 					// Partial param value is accumulating.
 					// Write the currently accumulated param content in real time
-					this.currentToolUse.params[this.currentParamName] = currentParamValue
+					// kilocode_change start
+					this.currentToolUse.params[this.currentParamName] = normalizeToolParamValue(
+						this.currentParamName,
+						currentParamValue,
+					)
+					// kilocode_change end
 					continue
 				}
 			}
@@ -141,11 +149,12 @@ export class AssistantMessageParser {
 						const contentEndIndex = toolContent.lastIndexOf(contentEndTag)
 
 						if (contentStartIndex !== -1 && contentEndIndex !== -1 && contentEndIndex > contentStartIndex) {
-							// Don't trim content to preserve newlines, but strip first and last newline only
-							this.currentToolUse.params[contentParamName] = toolContent
-								.slice(contentStartIndex, contentEndIndex)
-								.replace(/^\n/, "")
-								.replace(/\n$/, "")
+							// kilocode_change start
+							this.currentToolUse.params[contentParamName] = normalizeToolParamValue(
+								contentParamName,
+								toolContent.slice(contentStartIndex, contentEndIndex),
+							)
+							// kilocode_change end
 						}
 					}
 

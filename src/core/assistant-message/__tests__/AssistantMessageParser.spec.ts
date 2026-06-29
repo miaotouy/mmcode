@@ -275,6 +275,39 @@ describe("AssistantMessageParser (streaming)", () => {
 			expect(toolUse.params.content).toContain("line 3")
 			expect(toolUse.partial).toBe(false)
 		})
+
+		it("should unwrap CDATA from write_to_file content", () => {
+			const message = `<write_to_file><path>file.ts</path><content><![CDATA[
+const value = "<content stays literal>";
+]]></content></write_to_file>`
+			const result = streamChunks(parser, message).filter((block) => !isEmptyTextContent(block))
+
+			expect(result).toHaveLength(1)
+			const toolUse = result[0] as ToolUse
+			expect(toolUse.name).toBe("write_to_file")
+			expect(toolUse.params.content).toBe('const value = "<content stays literal>";')
+		})
+
+		it("should unwrap CDATA from apply_diff diff content", () => {
+			const message = `<apply_diff><path>file.ts</path><diff><![CDATA[
+<<<<<<< SEARCH
+const value = 1
+=======
+const value = 2
+>>>>>>> REPLACE
+]]></diff></apply_diff>`
+			const result = streamChunks(parser, message).filter((block) => !isEmptyTextContent(block))
+
+			expect(result).toHaveLength(1)
+			const toolUse = result[0] as ToolUse
+			expect(toolUse.name).toBe("apply_diff")
+			expect(toolUse.params.diff).toBe(`<<<<<<< SEARCH
+const value = 1
+=======
+const value = 2
+>>>>>>> REPLACE`)
+		})
+
 		it("should handle a complex message with multiple content types", () => {
 			const message = `I'll help you with that task.
 
