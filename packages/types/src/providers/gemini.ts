@@ -3,9 +3,75 @@ import type { ModelInfo } from "../model.js"
 // https://ai.google.dev/gemini-api/docs/models/gemini
 export type GeminiModelId = keyof typeof geminiModels
 
-export const geminiDefaultModelId: GeminiModelId = "gemini-3-pro-preview"
+export const geminiDefaultModelId: GeminiModelId = "gemini-3.5-flash"
 
 export const geminiModels = {
+	// kilocode_change start
+	"gemini-3.5-flash": {
+		maxTokens: 65_536,
+		contextWindow: 1_048_576,
+		supportsImages: true,
+		supportsNativeTools: true,
+		defaultToolProtocol: "native",
+		supportsPromptCache: true,
+		supportsReasoningEffort: ["minimal", "low", "medium", "high"],
+		reasoningEffort: "medium",
+
+		supportsTemperature: true,
+		defaultTemperature: 1,
+		inputPrice: 0.35,
+		outputPrice: 3.0,
+		cacheReadsPrice: 0.0875,
+		cacheWritesPrice: 1.0,
+		description: "Gemini 3.5 Flash: latest Flash model for fast multimodal and agentic work.",
+	},
+	"gemini-3.1-pro": {
+		maxTokens: 65_536,
+		contextWindow: 1_048_576,
+		supportsImages: true,
+		supportsNativeTools: true,
+		defaultToolProtocol: "native",
+		supportsPromptCache: true,
+		supportsReasoningEffort: ["low", "high"],
+		reasoningEffort: "low",
+
+		supportsTemperature: true,
+		defaultTemperature: 1,
+		inputPrice: 2.0,
+		outputPrice: 12.0,
+		tiers: [
+			{
+				contextWindow: 200_000,
+				inputPrice: 1.0,
+				outputPrice: 8.0,
+			},
+			{
+				contextWindow: Infinity,
+				inputPrice: 2.0,
+				outputPrice: 12.0,
+			},
+		],
+		description: "Gemini 3.1 Pro: stable Pro model for advanced reasoning and coding.",
+	},
+	"gemini-3.1-flash-lite": {
+		maxTokens: 65_536,
+		contextWindow: 1_048_576,
+		supportsImages: true,
+		supportsNativeTools: true,
+		defaultToolProtocol: "native",
+		supportsPromptCache: true,
+		supportsReasoningEffort: ["minimal", "low", "medium", "high"],
+		reasoningEffort: "medium",
+
+		supportsTemperature: true,
+		defaultTemperature: 1,
+		inputPrice: 0.1,
+		outputPrice: 0.4,
+		cacheReadsPrice: 0.025,
+		cacheWritesPrice: 1.0,
+		description: "Gemini 3.1 Flash-Lite: low-cost Gemini 3 model for high-throughput tasks.",
+	},
+	// kilocode_change end
 	"gemini-3-pro-preview": {
 		maxTokens: 65_536,
 		contextWindow: 1_048_576,

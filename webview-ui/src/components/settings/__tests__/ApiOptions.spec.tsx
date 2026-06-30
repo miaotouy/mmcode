@@ -99,8 +99,8 @@ vi.mock("@/components/ui", () => ({
 			className={className}
 		/>
 	),
-	CommandItem: ({ children, value, onSelect }: any) => (
-		<div className="command-item-mock" onClick={() => onSelect && onSelect(value)}>
+	CommandItem: ({ children, value, onSelect, ...props }: any) => (
+		<div className="command-item-mock" onClick={() => onSelect && onSelect(value)} {...props}>
 			{children}
 		</div>
 	),
@@ -377,7 +377,7 @@ describe("ApiOptions", () => {
 			},
 		})
 
-		expect(screen.queryByRole("option", { name: "kimi-for-coding" })).not.toBeInTheDocument()
+		expect(screen.queryByText("kimi-for-coding")).not.toBeInTheDocument()
 	})
 
 	it("shows kimi-for-coding in model options when Moonshot endpoint is coding", () => {
@@ -389,8 +389,8 @@ describe("ApiOptions", () => {
 			},
 		})
 
-		expect(screen.getByRole("option", { name: "kimi-for-coding" })).toBeInTheDocument()
-		expect(screen.getByRole("option", { name: "kimi-k2-thinking" })).toBeInTheDocument() // kilocode_change
+		expect(screen.getByText("kimi-for-coding")).toBeInTheDocument()
+		expect(screen.getByText("kimi-k2-thinking")).toBeInTheDocument() // kilocode_change
 	})
 
 	it("shows diff settings, temperature and rate limit controls by default", () => {

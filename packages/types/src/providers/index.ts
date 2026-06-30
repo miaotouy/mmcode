@@ -66,6 +66,7 @@ import { litellmDefaultModelId } from "./lite-llm.js"
 import { mistralDefaultModelId } from "./mistral.js"
 import { moonshotDefaultModelId } from "./moonshot.js"
 import { openAiCodexDefaultModelId } from "./openai-codex.js"
+import { openAiNativeDefaultModelId } from "./openai.js" // kilocode_change
 import { openRouterDefaultModelId } from "./openrouter.js"
 import { qwenCodeDefaultModelId } from "./qwen-code.js"
 import { requestyDefaultModelId } from "./requesty.js"
@@ -138,7 +139,7 @@ export function getProviderDefaultModelId(
 		case "zai":
 			return options?.isChina ? mainlandZAiDefaultModelId : internationalZAiDefaultModelId
 		case "openai-native":
-			return "gpt-4o" // Based on openai-native patterns
+			return openAiNativeDefaultModelId // kilocode_change
 		case "openai-responses": // kilocode_change
 			return "gpt-4o" // OpenAI-compatible Responses API // kilocode_change
 		case "openai-codex":

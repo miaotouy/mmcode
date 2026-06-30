@@ -415,7 +415,7 @@ export class GeminiHandler extends BaseProvider implements SingleCompletionHandl
 		const availableModels = this.models
 		const staticModels = geminiModels as Record<string, ModelInfo>
 
-		const id = requestedId && requestedId in availableModels ? requestedId : geminiDefaultModelId
+		const id = requestedId || geminiDefaultModelId
 
 		const info: ModelInfo =
 			availableModels[id] ??

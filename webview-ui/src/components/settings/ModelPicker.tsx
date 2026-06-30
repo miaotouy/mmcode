@@ -66,6 +66,7 @@ interface ModelPickerProps {
 	errorMessage?: string
 	simplifySettings?: boolean
 	hidePricing?: boolean
+	hideAutomaticFetchNotice?: boolean
 }
 
 export const ModelPicker = ({
@@ -79,6 +80,7 @@ export const ModelPicker = ({
 	// organizationAllowList, // kilocode_change: unused
 	errorMessage,
 	simplifySettings,
+	hideAutomaticFetchNotice,
 }: ModelPickerProps) => {
 	const { t } = useAppTranslation()
 
@@ -302,20 +304,21 @@ export const ModelPicker = ({
 							))
 						// kilocode_change end
 					}
-					{apiConfiguration.apiProvider !== "kilocode" && ( // kilocode_change
-						<div className="text-sm text-vscode-descriptionForeground">
-							<Trans
-								i18nKey="settings:modelPicker.automaticFetch"
-								components={{
-									serviceLink: <VSCodeLink href={serviceUrl} className="text-sm" />,
-									defaultModelLink: (
-										<VSCodeLink onClick={() => onSelect(defaultModelId)} className="text-sm" />
-									),
-								}}
-								values={{ serviceName, defaultModelId }}
-							/>
-						</div>
-					)}
+					{apiConfiguration.apiProvider !== "kilocode" &&
+						!hideAutomaticFetchNotice && ( // kilocode_change
+							<div className="text-sm text-vscode-descriptionForeground">
+								<Trans
+									i18nKey="settings:modelPicker.automaticFetch"
+									components={{
+										serviceLink: <VSCodeLink href={serviceUrl} className="text-sm" />,
+										defaultModelLink: (
+											<VSCodeLink onClick={() => onSelect(defaultModelId)} className="text-sm" />
+										),
+									}}
+									values={{ serviceName, defaultModelId }}
+								/>
+							</div>
+						)}
 				</div>
 			)}
 		</>

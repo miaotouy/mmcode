@@ -16,8 +16,9 @@ type ApiMessageForDetection = Anthropic.MessageParam & {
  *
  * Precedence:
  * 1. Locked Protocol (task-level lock for resumed tasks - highest priority)
- * 2. User/profile preference (providerSettings.toolProtocol)
- * 3. Native (default)
+ * 2. Model native-tool default, when the model explicitly supports native tools
+ * 3. User/profile preference (providerSettings.toolProtocol)
+ * 4. Native (default)
  *
  * @param providerSettings - The provider settings
  * @param _modelInfo - Unused, kept for API compatibility
@@ -27,7 +28,7 @@ type ApiMessageForDetection = Anthropic.MessageParam & {
  */
 export function resolveToolProtocol(
 	providerSettings: ProviderSettings,
-	_modelInfo?: unknown,
+	modelInfo?: unknown,
 	lockedProtocol?: ToolProtocol,
 	preferredToolProtocol?: ToolProtocol,
 ): ToolProtocol {
@@ -37,17 +38,27 @@ export function resolveToolProtocol(
 		return lockedProtocol
 	}
 
-	// 2. User/profile preference
+	// 2. User/profile preference (If user explicitly configured a protocol, respect it first!)
 	if (providerSettings.toolProtocol) {
 		return providerSettings.toolProtocol
 	}
 
-	// 3. Global preference
+	// kilocode_change start
+	// 3. Model native-tool default, when the model explicitly supports native tools
+	const modelToolProfile = modelInfo as
+		| { supportsNativeTools?: boolean; defaultToolProtocol?: ToolProtocol }
+		| undefined
+	if (modelToolProfile?.supportsNativeTools && modelToolProfile.defaultToolProtocol === TOOL_PROTOCOL.NATIVE) {
+		return TOOL_PROTOCOL.NATIVE
+	}
+	// kilocode_change end
+
+	// 4. Global preference
 	if (preferredToolProtocol) {
 		return preferredToolProtocol
 	}
 
-	// 4. Default to Native protocol for new tasks
+	// 5. Default to Native protocol for new tasks
 	return TOOL_PROTOCOL.NATIVE
 }
 

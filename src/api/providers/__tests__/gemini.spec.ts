@@ -183,13 +183,14 @@ describe("GeminiHandler", () => {
 			expect(modelInfo.info).toBeDefined()
 		})
 
-		it("should return default model if invalid model specified", () => {
+		it("should keep custom model ID if model is not in the preset list", () => {
 			const invalidHandler = new GeminiHandler({
 				apiModelId: "invalid-model",
 				geminiApiKey: "test-key",
 			})
 			const modelInfo = invalidHandler.getModel()
-			expect(modelInfo.id).toBe(geminiDefaultModelId) // Default model
+			expect(modelInfo.id).toBe("invalid-model")
+			expect(modelInfo.info).toBeDefined()
 		})
 	})
 

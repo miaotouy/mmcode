@@ -12,7 +12,7 @@ vitest.mock("@roo-code/telemetry", () => ({
 
 import { Anthropic } from "@anthropic-ai/sdk"
 
-import { ApiProviderError } from "@roo-code/types"
+import { ApiProviderError, openAiNativeDefaultModelId } from "@roo-code/types"
 
 import { OpenAiNativeHandler } from "../openai-native"
 import { ApiHandlerOptions } from "../../../shared/api"
@@ -218,13 +218,25 @@ describe("OpenAiNativeHandler", () => {
 				openAiNativeApiKey: "test-api-key",
 			})
 			const modelInfo = handlerWithoutModel.getModel()
-			expect(modelInfo.id).toBe("gpt-5.1-codex-max") // Default model
+			expect(modelInfo.id).toBe(openAiNativeDefaultModelId) // Default model
+			expect(modelInfo.info).toBeDefined()
+		})
+
+		it("should keep custom model ID if model is not in the preset list", () => {
+			const customHandler = new OpenAiNativeHandler({
+				openAiNativeApiKey: "test-api-key",
+				apiModelId: "gpt-new-custom-model",
+			})
+			const modelInfo = customHandler.getModel()
+			expect(modelInfo.id).toBe("gpt-new-custom-model")
 			expect(modelInfo.info).toBeDefined()
 		})
 
 		it("should have defaultToolProtocol: native for all OpenAI Native models", () => {
 			// Test that all models have defaultToolProtocol: native
 			const testModels = [
+				"gpt-5.5",
+				"gpt-5.5-chat-latest",
 				"gpt-5.1-codex-max",
 				"gpt-5.2",
 				"gpt-5.2-codex",

@@ -120,6 +120,9 @@ export class AnthropicHandler extends BaseProvider implements SingleCompletionHa
 			: {}
 
 		switch (modelId) {
+			case "claude-fable-5": // kilocode_change
+			case "claude-sonnet-5": // kilocode_change
+			case "claude-opus-4-8": // kilocode_change
 			case "claude-opus-4-6": // kilocode_change
 			case "claude-sonnet-4-6":
 			case "claude-sonnet-4-5":
@@ -195,6 +198,9 @@ export class AnthropicHandler extends BaseProvider implements SingleCompletionHa
 
 							// Then check for models that support prompt caching
 							switch (modelId) {
+								case "claude-fable-5": // kilocode_change
+								case "claude-sonnet-5": // kilocode_change
+								case "claude-opus-4-8": // kilocode_change
 								case "claude-opus-4-6": // kilocode_change
 								case "claude-sonnet-4-6":
 								case "claude-sonnet-4-5":
@@ -431,8 +437,8 @@ export class AnthropicHandler extends BaseProvider implements SingleCompletionHa
 
 	getModel() {
 		const modelId = this.options.apiModelId
-		let id = modelId && modelId in anthropicModels ? (modelId as AnthropicModelId) : anthropicDefaultModelId
-		let info: ModelInfo = anthropicModels[id]
+		const id = modelId || anthropicDefaultModelId
+		let info: ModelInfo = anthropicModels[id as AnthropicModelId] ?? anthropicModels[anthropicDefaultModelId]
 
 		// If 1M context beta is enabled for supported models, update the model info
 		if (

@@ -8,6 +8,7 @@ import {
 	type ProviderName,
 	type ProviderSettings,
 	DEFAULT_CONSECUTIVE_MISTAKE_LIMIT,
+	getProviderDefaultModelId,
 	openRouterDefaultModelId,
 	zenmuxDefaultModelId, // kilocode_change
 	requestyDefaultModelId,
@@ -129,8 +130,7 @@ import {
 
 import { MODELS_BY_PROVIDER, PROVIDERS } from "./constants"
 import { inputEventTransform, noTransform } from "./transforms"
-// import { ModelPicker } from "./ModelPicker" // kilocode_change
-import { ModelInfoView } from "./ModelInfoView"
+import { ModelPicker } from "./ModelPicker" // kilocode_change
 import { ApiErrorMessage } from "./ApiErrorMessage"
 import { ThinkingBudget } from "./ThinkingBudget"
 import { Verbosity } from "./Verbosity"
@@ -213,7 +213,6 @@ const ApiOptions = ({
 		[customHeaders, apiConfiguration?.openAiHeaders, setApiConfigurationField],
 	)
 
-	const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false)
 	const [isAdvancedSettingsOpen, setIsAdvancedSettingsOpen] = useState(false)
 
 	const handleInputChange = useCallback(
@@ -336,7 +335,7 @@ const ApiOptions = ({
 	const selectedProviderModels = useMemo(() => {
 		const models = MODELS_BY_PROVIDER[selectedProvider]
 
-		if (!models) return []
+		if (!models) return undefined
 
 		const filteredModels = filterModels(models, selectedProvider, organizationAllowList)
 		// kilocode_change start
@@ -355,21 +354,22 @@ const ApiOptions = ({
 		// Include the currently selected model even if deprecated (so users can see what they have selected)
 		// But filter out other deprecated models from being newly selectable
 		const availableModels = modelsAllowedByEndpoint
-			? Object.entries(modelsAllowedByEndpoint)
-					.filter(([modelId, modelInfo]) => {
-						// Always include the currently selected model
-						if (modelId === selectedModelId) return true
-						// Filter out deprecated models that aren't currently selected
-						return !modelInfo.deprecated
-					})
-					.map(([modelId]) => ({
-						value: modelId,
-						label: modelId,
-					}))
-			: []
+			? Object.entries(modelsAllowedByEndpoint).filter(([modelId, modelInfo]) => {
+					// Always include the currently selected model
+					if (modelId === selectedModelId) return true
+					// Filter out deprecated models that aren't currently selected
+					return !modelInfo.deprecated
+				})
+			: undefined
 
-		return availableModels
+		return availableModels ? Object.fromEntries(availableModels) : undefined
 	}, [selectedProvider, organizationAllowList, selectedModelId, apiConfiguration.moonshotBaseUrl])
+
+	const selectedProviderDefaultModelId = useMemo(() => {
+		return getProviderDefaultModelId(selectedProvider, {
+			isChina: apiConfiguration.zaiApiLine === "china_coding" || apiConfiguration.zaiApiLine === "china_api",
+		})
+	}, [selectedProvider, apiConfiguration.zaiApiLine])
 
 	const onProviderChange = useCallback(
 		(value: ProviderName) => {
@@ -1009,9 +1009,41 @@ const ApiOptions = ({
 			{/* kilocode_change end */}
 
 			{/* Skip generic model picker for claude-code/openai-codex since they have their own model pickers */}
-			{selectedProviderModels.length > 0 &&
+			{selectedProviderModels &&
+				Object.keys(selectedProviderModels).length > 0 &&
 				selectedProvider !== "claude-code" &&
-				selectedProvider !== "openai-codex" && (
+				selectedProvider !== "openai-codex" &&
+				selectedProvider !== "bedrock" && (
+					<>
+						<ModelPicker
+							apiConfiguration={apiConfiguration}
+							setApiConfigurationField={(field, value, isUserAction) => {
+								setApiConfigurationField(field, value, isUserAction)
+
+								// Clear reasoning effort when switching models to allow the new model's default to take effect
+								// This is especially important for GPT-5 models which default to "medium"
+								if (field === "apiModelId" && selectedProvider === "openai-native") {
+									setApiConfigurationField("reasoningEffort", undefined)
+								}
+							}}
+							defaultModelId={selectedProviderDefaultModelId}
+							models={selectedProviderModels}
+							modelIdKey="apiModelId"
+							serviceName={
+								PROVIDERS.find(({ value }) => value === selectedProvider)?.label ?? selectedProvider
+							}
+							serviceUrl={docs?.url ?? ""}
+							organizationAllowList={organizationAllowList}
+							errorMessage={modelValidationError}
+							simplifySettings={fromWelcomeView}
+							hideAutomaticFetchNotice
+						/>
+					</>
+				)}
+
+			{selectedProviderModels &&
+				Object.keys(selectedProviderModels).length > 0 &&
+				selectedProvider === "bedrock" && (
 					<>
 						<div>
 							<label className="block font-medium mb-1">{t("settings:providers.model")}</label>
@@ -1021,28 +1053,20 @@ const ApiOptions = ({
 									setApiConfigurationField("apiModelId", value)
 
 									// Clear custom ARN if not using custom ARN option.
-									if (value !== "custom-arn" && selectedProvider === "bedrock") {
+									if (value !== "custom-arn") {
 										setApiConfigurationField("awsCustomArn", "")
-									}
-
-									// Clear reasoning effort when switching models to allow the new model's default to take effect
-									// This is especially important for GPT-5 models which default to "medium"
-									if (selectedProvider === "openai-native") {
-										setApiConfigurationField("reasoningEffort", undefined)
 									}
 								}}>
 								<SelectTrigger className="w-full">
 									<SelectValue placeholder={t("settings:common.select")} />
 								</SelectTrigger>
 								<SelectContent>
-									{selectedProviderModels.map((option) => (
-										<SelectItem key={option.value} value={option.value}>
-											{option.label}
+									{Object.keys(selectedProviderModels).map((modelId) => (
+										<SelectItem key={modelId} value={modelId}>
+											{modelId}
 										</SelectItem>
 									))}
-									{selectedProvider === "bedrock" && (
-										<SelectItem value="custom-arn">{t("settings:labels.useCustomArn")}</SelectItem>
-									)}
+									<SelectItem value="custom-arn">{t("settings:labels.useCustomArn")}</SelectItem>
 								</SelectContent>
 							</Select>
 						</div>
@@ -1052,21 +1076,10 @@ const ApiOptions = ({
 							<ApiErrorMessage errorMessage={t("settings:validation.modelDeprecated")} />
 						)}
 
-						{selectedProvider === "bedrock" && selectedModelId === "custom-arn" && (
+						{selectedModelId === "custom-arn" && (
 							<BedrockCustomArn
 								apiConfiguration={apiConfiguration}
 								setApiConfigurationField={setApiConfigurationField}
-							/>
-						)}
-
-						{/* Only show model info if not deprecated */}
-						{!selectedModelInfo?.deprecated && (
-							<ModelInfoView
-								apiProvider={selectedProvider}
-								selectedModelId={selectedModelId}
-								modelInfo={selectedModelInfo}
-								isDescriptionExpanded={isDescriptionExpanded}
-								setIsDescriptionExpanded={setIsDescriptionExpanded}
 							/>
 						)}
 					</>

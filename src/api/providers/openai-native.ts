@@ -6,6 +6,7 @@ import OpenAI from "openai"
 import { Package } from "../../shared/package"
 import {
 	type ModelInfo,
+	openAiModelInfoSaneDefaults,
 	openAiNativeDefaultModelId,
 	OpenAiNativeModelId,
 	openAiNativeModels,
@@ -1345,10 +1346,9 @@ export class OpenAiNativeHandler extends BaseProvider implements SingleCompletio
 	override getModel() {
 		const modelId = this.options.apiModelId
 
-		let id =
-			modelId && modelId in openAiNativeModels ? (modelId as OpenAiNativeModelId) : openAiNativeDefaultModelId
+		const id = modelId || openAiNativeDefaultModelId
 
-		const info: ModelInfo = openAiNativeModels[id]
+		const info: ModelInfo = openAiNativeModels[id as OpenAiNativeModelId] ?? openAiModelInfoSaneDefaults
 
 		const params = getModelParams({
 			format: "openai",

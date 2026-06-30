@@ -3,9 +3,48 @@ import type { ModelInfo } from "../model.js"
 // https://openai.com/api/pricing/
 export type OpenAiNativeModelId = keyof typeof openAiNativeModels
 
-export const openAiNativeDefaultModelId: OpenAiNativeModelId = "gpt-5.1-codex-max"
+export const openAiNativeDefaultModelId: OpenAiNativeModelId = "gpt-5.5"
 
 export const openAiNativeModels = {
+	// kilocode_change start
+	"gpt-5.5": {
+		maxTokens: 128000,
+		contextWindow: 400000,
+		supportsNativeTools: true,
+		defaultToolProtocol: "native",
+		includedTools: ["apply_patch"],
+		excludedTools: ["apply_diff", "write_to_file"],
+		supportsImages: true,
+		supportsPromptCache: true,
+		promptCacheRetention: "24h",
+		supportsReasoningEffort: ["none", "low", "medium", "high", "xhigh"],
+		reasoningEffort: "medium",
+		inputPrice: 2.0,
+		outputPrice: 16.0,
+		cacheReadsPrice: 0.2,
+		supportsVerbosity: true,
+		supportsTemperature: false,
+		tiers: [
+			{ name: "flex", contextWindow: 400000, inputPrice: 1.0, outputPrice: 8.0, cacheReadsPrice: 0.1 },
+			{ name: "priority", contextWindow: 400000, inputPrice: 4.0, outputPrice: 32.0, cacheReadsPrice: 0.4 },
+		],
+		description: "GPT-5.5: latest flagship model for complex coding, writing, and agentic workflows",
+	},
+	"gpt-5.5-chat-latest": {
+		maxTokens: 32_768,
+		contextWindow: 128_000,
+		supportsNativeTools: true,
+		defaultToolProtocol: "native",
+		includedTools: ["apply_patch"],
+		excludedTools: ["apply_diff", "write_to_file"],
+		supportsImages: true,
+		supportsPromptCache: true,
+		inputPrice: 2.0,
+		outputPrice: 16.0,
+		cacheReadsPrice: 0.2,
+		description: "GPT-5.5 Chat: latest GPT-5.5 conversational model",
+	},
+	// kilocode_change end
 	"gpt-5.1-codex-max": {
 		maxTokens: 128000,
 		contextWindow: 400000,

@@ -6,9 +6,38 @@ import type { ModelInfo } from "../model.js"
 // continuation within the same turn. See: https://api-docs.deepseek.com/guides/thinking_mode
 export type DeepSeekModelId = keyof typeof deepSeekModels
 
-export const deepSeekDefaultModelId: DeepSeekModelId = "deepseek-chat"
+export const deepSeekDefaultModelId: DeepSeekModelId = "deepseek-v4-flash"
 
 export const deepSeekModels = {
+	// kilocode_change start
+	"deepseek-v4-flash": {
+		maxTokens: 16_384,
+		contextWindow: 128_000,
+		supportsImages: false,
+		supportsPromptCache: true,
+		supportsNativeTools: true,
+		defaultToolProtocol: "native",
+		inputPrice: 0.25,
+		outputPrice: 0.38,
+		cacheWritesPrice: 0.25,
+		cacheReadsPrice: 0.025,
+		description: "DeepSeek-V4 Flash: latest fast DeepSeek model for coding, chat, and tool use.",
+	},
+	"deepseek-v4-pro": {
+		maxTokens: 16_384,
+		contextWindow: 128_000,
+		supportsImages: false,
+		supportsPromptCache: true,
+		supportsNativeTools: true,
+		defaultToolProtocol: "native",
+		preserveReasoning: true,
+		inputPrice: 0.55,
+		outputPrice: 1.65,
+		cacheWritesPrice: 0.55,
+		cacheReadsPrice: 0.055,
+		description: "DeepSeek-V4 Pro: latest DeepSeek thinking model for harder reasoning and coding tasks.",
+	},
+	// kilocode_change end
 	"deepseek-chat": {
 		maxTokens: 8192, // 8K max output
 		contextWindow: 128_000,

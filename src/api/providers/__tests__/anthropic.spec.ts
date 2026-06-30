@@ -315,6 +315,16 @@ describe("AnthropicHandler", () => {
 			expect(model.info.supportsPromptCache).toBe(true)
 		})
 
+		it("should keep custom model ID if model is not in the preset list", () => {
+			const customHandler = new AnthropicHandler({
+				...mockOptions,
+				apiModelId: "claude-new-custom-model",
+			})
+			const model = customHandler.getModel()
+			expect(model.id).toBe("claude-new-custom-model")
+			expect(model.info).toBeDefined()
+		})
+
 		it("honors custom maxTokens for thinking models", () => {
 			const handler = new AnthropicHandler({
 				apiKey: "test-api-key",

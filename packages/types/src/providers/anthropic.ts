@@ -3,10 +3,55 @@ import type { ModelInfo } from "../model.js"
 // https://docs.anthropic.com/en/docs/about-claude/models
 
 export type AnthropicModelId = keyof typeof anthropicModels
-export const anthropicDefaultModelId: AnthropicModelId = "claude-sonnet-4-5"
+export const anthropicDefaultModelId: AnthropicModelId = "claude-sonnet-5"
 
 export const anthropicModels = {
 	// kilocode_change start
+	"claude-fable-5": {
+		maxTokens: 64_000,
+		contextWindow: 400_000,
+		supportsImages: true,
+		supportsPromptCache: true,
+		supportsNativeTools: true,
+		defaultToolProtocol: "native",
+		inputPrice: 0.8,
+		outputPrice: 4.0,
+		cacheWritesPrice: 1.0,
+		cacheReadsPrice: 0.08,
+		supportsAdaptiveThinking: true,
+		supportsVerbosity: ["low", "medium", "high", "max"],
+		description: "Claude Fable 5: fast frontier Claude model for balanced coding and everyday agent work.",
+	},
+	"claude-sonnet-5": {
+		maxTokens: 128_000,
+		contextWindow: 400_000,
+		supportsImages: true,
+		supportsPromptCache: true,
+		supportsNativeTools: true,
+		defaultToolProtocol: "native",
+		inputPrice: 3.0,
+		outputPrice: 15.0,
+		cacheWritesPrice: 3.75,
+		cacheReadsPrice: 0.3,
+		supportsAdaptiveThinking: true,
+		supportsVerbosity: ["low", "medium", "high", "max"],
+		description: "Claude Sonnet 5: latest Sonnet model with adaptive thinking, vision, and native tool use.",
+	},
+	"claude-opus-4-8": {
+		maxTokens: 64_000,
+		contextWindow: 200_000,
+		supportsImages: true,
+		supportsPromptCache: true,
+		supportsNativeTools: true,
+		defaultToolProtocol: "native",
+		inputPrice: 5.0,
+		outputPrice: 25.0,
+		cacheWritesPrice: 6.25,
+		cacheReadsPrice: 0.5,
+		supportsAdaptiveThinking: true,
+		supportsVerbosity: ["low", "medium", "high", "max"],
+		description: "Claude Opus 4.8: latest Opus model for the hardest coding and reasoning tasks.",
+	},
 	"claude-opus-4-6": {
 		maxTokens: 128_000,
 		contextWindow: 200_000,
