@@ -132,7 +132,8 @@ export async function applyDiffTool(
 			// IMPORTANT: We use parseXmlForDiff here instead of parseXml to prevent HTML entity decoding
 			// This ensures exact character matching when comparing parsed content against original file content
 			// Without this, special characters like & would be decoded to &amp; causing diff mismatches
-			const parsed = parseXmlForDiff(argsXmlTag, ["file.diff.content"]) as ParsedXmlResult
+			// kilocode_change: argsXmlTag starts at <file>, because <args> is stripped by the XML tool parser.
+			const parsed = parseXmlForDiff(argsXmlTag, ["diff.content"]) as ParsedXmlResult
 			const files = Array.isArray(parsed.file) ? parsed.file : [parsed.file].filter(Boolean)
 
 			for (const file of files) {

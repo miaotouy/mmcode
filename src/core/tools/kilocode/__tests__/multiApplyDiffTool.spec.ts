@@ -78,6 +78,7 @@ describe("multiApplyDiffTool", () => {
 				getModel: vi.fn().mockReturnValue({ id: "test-model" }),
 			},
 			apiConfiguration: {
+				toolProtocol: "xml",
 				toolStyle: "xml",
 			},
 			rooIgnoreController: {
@@ -102,6 +103,44 @@ describe("multiApplyDiffTool", () => {
 		;(fileUtils.fileExistsAtPath as any).mockResolvedValue(true)
 		;(fs.readFile as any).mockResolvedValue("original content")
 		;(pathUtils.getReadablePath as any).mockImplementation((cwd: string, path: string) => path)
+	})
+
+	describe("XML args parsing", () => {
+		it("unwraps CDATA when the closing marker is on the REPLACE line", async () => {
+			mockBlock = {
+				params: {
+					args: `<file>
+						<path>test.ts</path>
+						<diff>
+							<content><![CDATA[
+<<<<<<< SEARCH
+original content
+=======
+modified content
+>>>>>>> REPLACE]]></content>
+						</diff>
+					</file>`,
+				},
+				partial: false,
+			}
+
+			await applyDiffTool(
+				mockCline,
+				mockBlock,
+				mockAskApproval,
+				mockHandleError,
+				mockPushToolResult,
+				mockRemoveClosingTag,
+			)
+
+			expect(mockCline.diffStrategy.applyDiff).toHaveBeenCalledWith("original content", [
+				{
+					content: "\n<<<<<<< SEARCH\noriginal content\n=======\nmodified content\n>>>>>>> REPLACE",
+					startLine: undefined,
+				},
+			])
+			expect(mockHandleError).not.toHaveBeenCalled()
+		})
 	})
 
 	describe("JSON toolStyle tests", () => {
