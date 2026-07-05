@@ -265,14 +265,25 @@ export class ApplyDiffTool extends BaseTool<"apply_diff"> {
 
 			// Used to determine if we should wait for busy terminal to update before sending api request
 			task.didEditFile = true
+
+			// kilocode_change start
 			let partFailHint = ""
+			const hasFailures = !!(diffResult.failParts && diffResult.failParts.some((p) => !p.success))
 
 			if (diffResult.failParts && diffResult.failParts.length > 0) {
-				partFailHint = `But unable to apply all diff parts to file: ${absolutePath}, silently use <read_file> tool to check newest file version and re-apply diffs\n`
+				const summaryLines = diffResult.failParts.map((part, idx) => {
+					if (part.success) {
+						return `- Block ${idx + 1}: [SUCCESS] Applied successfully.`
+					} else {
+						return `- Block ${idx + 1}: [FAILED] ${part.error || "Search content not found or mismatch."}`
+					}
+				})
+				partFailHint = `\n==================================================\n[WARNING] PARTIAL DIFF APPLICATION FAILURE\n==================================================\nSome SEARCH/REPLACE blocks could not be applied to ${relPath}:\n${summaryLines.join("\n")}\n\nBecause of these failures, the file content is now in an intermediate state. You MUST use the <read_file> tool to inspect the current file content before making any further edits or assumptions!\n==================================================\n\n`
 			}
 
 			// Get the formatted response message
-			const message = await task.diffViewProvider.pushToolWriteResult(task, task.cwd, !fileExists)
+			const message = await task.diffViewProvider.pushToolWriteResult(task, task.cwd, !fileExists, hasFailures)
+			// kilocode_change end
 
 			// Check for single SEARCH/REPLACE block warning
 			const searchBlocks = (diffContent.match(/<<<<<<< SEARCH/g) || []).length

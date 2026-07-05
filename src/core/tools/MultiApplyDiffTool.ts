@@ -261,7 +261,7 @@ Original error: ${errorMessage}`
 		const allDiffErrors: string[] = [] // Collect all diff errors
 
 		for (const operation of operations) {
-			const { path: relPath, diff: diffItems } = operation
+			const { path: relPath } = operation
 
 			// Verify file access is allowed
 			const accessAllowed = cline.rooIgnoreController?.validateAccess(relPath)
@@ -273,9 +273,6 @@ Original error: ${errorMessage}`
 				})
 				continue
 			}
-
-			// Check if file is write-protected
-			const isWriteProtected = cline.rooProtectedController?.isWriteProtected(relPath) || false
 
 			// Verify file exists
 			const absolutePath = path.resolve(cline.cwd, relPath)
@@ -720,14 +717,30 @@ ${errorDetails ? `\nTechnical details:\n${errorDetails}\n` : ""}
 
 				// Used to determine if we should wait for busy terminal to update before sending api request
 				cline.didEditFile = true
-				let partFailHint = ""
 
-				if (successCount < diffItems.length) {
-					partFailHint = `Unable to apply all diff parts to file: ${absolutePath}`
+				// kilocode_change start
+				let partFailHint = ""
+				const hasFailures = !!(diffResult.failParts && diffResult.failParts.some((p) => !p.success))
+
+				if (diffResult.failParts && diffResult.failParts.length > 0) {
+					const summaryLines = diffResult.failParts.map((part, idx) => {
+						if (part.success) {
+							return `- Block ${idx + 1}: [SUCCESS] Applied successfully.`
+						} else {
+							return `- Block ${idx + 1}: [FAILED] ${part.error || "Search content not found or mismatch."}`
+						}
+					})
+					partFailHint = `\n==================================================\n[WARNING] PARTIAL DIFF APPLICATION FAILURE\n==================================================\nSome SEARCH/REPLACE blocks could not be applied to ${relPath}:\n${summaryLines.join("\n")}\n\nBecause of these failures, the file content is now in an intermediate state. You MUST use the <read_file> tool to inspect the current file content before making any further edits or assumptions!\n==================================================\n\n`
 				}
 
 				// Get the formatted response message
-				const message = await cline.diffViewProvider.pushToolWriteResult(cline, cline.cwd, !fileExists)
+				const message = await cline.diffViewProvider.pushToolWriteResult(
+					cline,
+					cline.cwd,
+					!fileExists,
+					hasFailures,
+				)
+				// kilocode_change end
 
 				if (partFailHint) {
 					results.push(partFailHint + "\n" + message)

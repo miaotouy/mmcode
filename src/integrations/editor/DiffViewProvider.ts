@@ -333,9 +333,11 @@ export class DiffViewProvider {
 	 * @param task Task instance to get protocol info
 	 * @param cwd Current working directory for path resolution
 	 * @param isNewFile Whether this is a new file or an existing file being modified
+	 * @param hasFailures Whether some diff parts failed to apply (kilocode_change)
 	 * @returns Formatted message (JSON for native protocol, XML for legacy)
 	 */
-	async pushToolWriteResult(task: Task, cwd: string, isNewFile: boolean): Promise<string> {
+	async pushToolWriteResult(task: Task, cwd: string, isNewFile: boolean, hasFailures?: boolean): Promise<string> {
+		// kilocode_change
 		if (!this.relPath) {
 			throw new Error("No file path available in DiffViewProvider")
 		}
@@ -358,15 +360,23 @@ export class DiffViewProvider {
 		const useNative = isNativeProtocol(toolProtocol)
 
 		// Build notices array
-		const notices = [
-			"You do not need to re-read the file, as you have seen all changes",
-			"Proceed with the task using these changes as the new baseline.",
-			...(this.userEdits
-				? [
-						"If the user's edits have addressed part of the task or changed the requirements, adjust your approach accordingly.",
-					]
-				: []),
-		]
+		// kilocode_change start
+		const notices = hasFailures
+			? [
+					"WARNING: Some diff parts failed to apply! The file content is NOT what you expected.",
+					"You MUST use the read_file tool to read the latest content of the file to see what was actually applied and what failed.",
+					"Do NOT assume all your changes are in the file.",
+				]
+			: [
+					"You do not need to re-read the file, as you have seen all changes",
+					"Proceed with the task using these changes as the new baseline.",
+					...(this.userEdits
+						? [
+								"If the user's edits have addressed part of the task or changed the requirements, adjust your approach accordingly.",
+							]
+						: []),
+				]
+		// kilocode_change end
 
 		if (useNative) {
 			// Return JSON for native protocol
