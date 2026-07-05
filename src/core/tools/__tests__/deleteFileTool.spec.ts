@@ -126,7 +126,7 @@ describe("deleteFileTool", () => {
 			type: "tool_use",
 			name: "delete_file",
 			params: {
-				path: testFilePath,
+				paths: testFilePath,
 				...params,
 			},
 			partial: isPartial,
@@ -145,11 +145,11 @@ describe("deleteFileTool", () => {
 	}
 
 	describe("parameter validation", () => {
-		it("should handle missing path parameter", async () => {
-			await executeDeleteFileTool({ path: undefined })
+		it("should handle missing paths parameter", async () => {
+			await executeDeleteFileTool({ paths: undefined })
 
 			expect(mockCline.recordToolError).toHaveBeenCalledWith("delete_file")
-			expect(mockCline.sayAndCreateMissingParamError).toHaveBeenCalledWith("delete_file", "path")
+			expect(mockCline.sayAndCreateMissingParamError).toHaveBeenCalledWith("delete_file", "paths")
 		})
 	})
 
@@ -200,6 +200,76 @@ describe("deleteFileTool", () => {
 			expect(mockAskApproval).toHaveBeenCalled()
 			expect(mockedFsUnlink).toHaveBeenCalled()
 			expect(mockPushToolResult).toHaveBeenCalledWith(expect.stringContaining("Deleted file"))
+		})
+
+		it("should successfully delete multiple files", async () => {
+			mockedFsStat.mockResolvedValue({
+				isDirectory: () => false,
+			} as any)
+
+			const toolUse: ToolUse = {
+				type: "tool_use",
+				name: "delete_file",
+				params: {
+					paths: "test/file1.txt, test/file2.txt",
+				},
+				partial: false,
+			}
+
+			await deleteFileTool(
+				mockCline,
+				toolUse,
+				mockAskApproval,
+				mockHandleError,
+				mockPushToolResult,
+				mockRemoveClosingTag,
+			)
+
+			expect(mockCline.consecutiveMistakeCount).toBe(0)
+			expect(mockAskApproval).toHaveBeenCalledTimes(1)
+			expect(mockedFsUnlink).toHaveBeenCalledTimes(2)
+			const expectedMsg = `Deleted file: ${path.normalize("test/file1.txt")}\nDeleted file: ${path.normalize("test/file2.txt")}`
+			expect(mockPushToolResult).toHaveBeenCalledWith(expect.stringContaining(expectedMsg))
+		})
+
+		it("should handle partial failures gracefully when deleting multiple files", async () => {
+			mockedFsStat.mockResolvedValue({
+				isDirectory: () => false,
+			} as any)
+
+			// Make the second unlink fail
+			mockedFsUnlink
+				.mockResolvedValueOnce(undefined) // first file succeeds
+				.mockRejectedValueOnce(new Error("Permission denied")) // second file fails
+
+			const toolUse: ToolUse = {
+				type: "tool_use",
+				name: "delete_file",
+				params: {
+					paths: "test/file1.txt, test/file2.txt",
+				},
+				partial: false,
+			}
+
+			await deleteFileTool(
+				mockCline,
+				toolUse,
+				mockAskApproval,
+				mockHandleError,
+				mockPushToolResult,
+				mockRemoveClosingTag,
+			)
+
+			expect(mockCline.consecutiveMistakeCount).toBeGreaterThan(0)
+			expect(mockAskApproval).toHaveBeenCalledTimes(1)
+			expect(mockedFsUnlink).toHaveBeenCalledTimes(2)
+
+			const expectedSuccessMsg = `Deleted file: ${path.normalize("test/file1.txt")}`
+			const expectedErrorMsg = `Failed to delete ${path.normalize("test/file2.txt")}: Permission denied`
+
+			expect(mockPushToolResult).toHaveBeenCalledWith(expect.stringContaining("Some deletions failed:"))
+			expect(mockPushToolResult).toHaveBeenCalledWith(expect.stringContaining(expectedSuccessMsg))
+			expect(mockPushToolResult).toHaveBeenCalledWith(expect.stringContaining(expectedErrorMsg))
 		})
 
 		it("should successfully delete an empty directory", async () => {
@@ -277,7 +347,7 @@ describe("deleteFileTool", () => {
 			const toolUse: ToolUse = {
 				type: "tool_use",
 				name: "delete_file",
-				params: { path: testDirPath },
+				params: { paths: testDirPath },
 				partial: false,
 			}
 
@@ -314,7 +384,7 @@ describe("deleteFileTool", () => {
 			const toolUse: ToolUse = {
 				type: "tool_use",
 				name: "delete_file",
-				params: { path: ".git" },
+				params: { paths: ".git" },
 				partial: false,
 			}
 
@@ -364,7 +434,7 @@ describe("deleteFileTool", () => {
 
 	describe("path display", () => {
 		it("should pass relPath (not relativePath) to getReadablePath for approval message", async () => {
-			await executeDeleteFileTool({ path: ".gitignore" })
+			await executeDeleteFileTool({ paths: ".gitignore" })
 
 			// getReadablePath should be called with the original relPath, not the computed relativePath
 			// This prevents bugs where empty relativePath causes cwd basename to be shown
@@ -372,7 +442,7 @@ describe("deleteFileTool", () => {
 		})
 
 		it("should pass relPath (not relativePath) to getReadablePath for partial message", async () => {
-			await executeDeleteFileTool({ path: ".gitignore" })
+			await executeDeleteFileTool({ paths: ".gitignore" })
 
 			// The partial message is sent regardless of the block.partial flag
 			// getReadablePath should be called with relPath for this message
@@ -382,7 +452,7 @@ describe("deleteFileTool", () => {
 		it("should handle dot path correctly without showing workspace directory name", async () => {
 			// This is a regression test for a bug where "." would cause
 			// the workspace directory name to be shown instead of the file path
-			await executeDeleteFileTool({ path: "." })
+			await executeDeleteFileTool({ paths: "." })
 
 			// Should be called with ".", not with empty string or computed relativePath
 			expect(mockedGetReadablePath).toHaveBeenCalledWith(mockCline.cwd, ".")

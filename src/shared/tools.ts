@@ -89,6 +89,7 @@ export const toolParamNames = [
 	"old_string", // search_replace and edit_file parameter
 	"new_string", // search_replace and edit_file parameter
 	"expected_replacements", // edit_file parameter for multiple occurrences
+	"paths", // kilocode_change: delete_file parameter for multiple paths
 ] as const
 
 export type ToolParamName = (typeof toolParamNames)[number]
@@ -196,7 +197,7 @@ export interface WriteToFileToolUse extends ToolUse<"write_to_file"> {
 // kilocode_change start
 export interface DeleteFileToolUse extends ToolUse {
 	name: "delete_file"
-	params: Partial<Pick<Record<ToolParamName, string>, "path">>
+	params: Partial<Pick<Record<ToolParamName, string>, "paths">>
 }
 // kilocode_change end
 

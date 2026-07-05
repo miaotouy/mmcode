@@ -661,47 +661,55 @@ export const ChatRowContent = ({
 				)
 			// kilocode_change start
 			case "deleteFile":
+				const deletePaths = (tool as any).paths || (tool.path ? [tool.path] : [])
 				return (
 					<>
 						<div style={headerStyle}>
 							<Trash2 className="w-4 shrink-0" aria-label="Delete icon" />
 							<span style={{ fontWeight: "bold" }}>
-								{tool.stats
-									? t("chat:fileOperations.wantsToDeleteDirectory")
-									: t("chat:fileOperations.wantsToDelete")}
+								{deletePaths.length > 1
+									? t(
+											"chat:fileOperations.wantsToDeleteMultiple",
+											"Wants to delete multiple files/directories",
+										)
+									: tool.stats
+										? t("chat:fileOperations.wantsToDeleteDirectory")
+										: t("chat:fileOperations.wantsToDelete")}
 							</span>
 						</div>
-						<div className="pl-6">
-							<ToolUseBlock>
-								<ToolUseBlockHeader className="group">
-									{tool.path?.startsWith(".") && <span>.</span>}
-									<span className="whitespace-nowrap overflow-hidden text-ellipsis text-left mr-2 rtl">
-										{removeLeadingNonAlphanumeric(tool.path ?? "") + "\u200E"}
-									</span>
-								</ToolUseBlockHeader>
-								{tool.stats && tool.stats.isComplete === true && (
-									<div
-										className="py-1.5 text-xs text-vscode-descriptionForeground"
-										style={{
-											borderTop: "1px solid var(--vscode-editorGroup-border)",
-										}}>
-										<div className="flex items-center gap-3 flex-wrap">
-											<span className="flex items-center gap-1">
-												<span>📁</span>
-												<span>{tool.stats.directories}</span>
-											</span>
-											<span className="flex items-center gap-1">
-												<span>📄</span>
-												<span>{tool.stats.files}</span>
-											</span>
-											<span className="flex items-center gap-1">
-												<span>💾</span>
-												<span>{formatFileSize(tool.stats.size)}</span>
-											</span>
+						<div className="pl-6 flex flex-col gap-2">
+							{deletePaths.map((p: string, idx: number) => (
+								<ToolUseBlock key={idx}>
+									<ToolUseBlockHeader className="group">
+										{p.startsWith(".") && <span>.</span>}
+										<span className="whitespace-nowrap overflow-hidden text-ellipsis text-left mr-2 rtl">
+											{removeLeadingNonAlphanumeric(p) + "\u200E"}
+										</span>
+									</ToolUseBlockHeader>
+									{idx === 0 && tool.stats && tool.stats.isComplete === true && (
+										<div
+											className="py-1.5 text-xs text-vscode-descriptionForeground"
+											style={{
+												borderTop: "1px solid var(--vscode-editorGroup-border)",
+											}}>
+											<div className="flex items-center gap-3 flex-wrap">
+												<span className="flex items-center gap-1">
+													<span>📁</span>
+													<span>{tool.stats.directories}</span>
+												</span>
+												<span className="flex items-center gap-1">
+													<span>📄</span>
+													<span>{tool.stats.files}</span>
+												</span>
+												<span className="flex items-center gap-1">
+													<span>💾</span>
+													<span>{formatFileSize(tool.stats.size)}</span>
+												</span>
+											</div>
 										</div>
-									</div>
-								)}
-							</ToolUseBlock>
+									)}
+								</ToolUseBlock>
+							))}
 						</div>
 					</>
 				)

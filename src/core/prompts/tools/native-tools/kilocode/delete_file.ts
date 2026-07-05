@@ -10,12 +10,12 @@ export default {
 		parameters: {
 			type: "object",
 			properties: {
-				path: {
+				paths: {
 					type: "string",
-					description: "Path to the file or directory to delete, relative to the workspace",
+					description: "Comma-separated paths to files or directories to delete, relative to the workspace.",
 				},
 			},
-			required: ["path"],
+			required: ["paths"],
 			additionalProperties: false,
 		},
 	},

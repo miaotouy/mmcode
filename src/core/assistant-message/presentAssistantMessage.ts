@@ -451,8 +451,20 @@ export async function presentAssistantMessage(cline: Task) {
 					// kilocode_change start
 					// case "edit_file":
 					// 	return `[${block.name} for '${block.params.target_file}']`
-					case "delete_file":
-						return `[${block.name} for '${block.params.path}']`
+					case "delete_file": {
+						const pathsRaw = block.params.paths
+						if (pathsRaw) {
+							const paths = pathsRaw
+								.split(",")
+								.map((p: string) => p.trim())
+								.filter((p: string) => p.length > 0)
+							if (paths.length > 1) {
+								return `[${block.name} for '${paths[0]}' and ${paths.length - 1} more file${paths.length > 2 ? "s" : ""}]`
+							}
+							return `[${block.name} for '${paths[0]}']`
+						}
+						return `[${block.name}]`
+					}
 					// kilocode_change end
 					case "search_replace":
 						return `[${block.name} for '${block.params.file_path}']`

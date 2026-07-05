@@ -5,14 +5,14 @@ import { ToolArgs } from "./types"
 export function getDeleteFileDescription(args: ToolArgs): string {
 	return `## delete_file
 
-描述: 从工作空间删除文件或目录。是 rm 命令的安全替代方案，全平台支持。
+描述: 从工作空间删除一个或多个文件或目录。是 rm 命令的安全替代方案，全平台支持。
 
 **参数:**
-- path (必填): 要删除的文件或目录路径（相对于工作目录 ${args.cwd}）
+- paths (必填): 要删除的一个或多个文件或目录路径，用逗号分隔（相对于工作目录 ${args.cwd}）。
 
 **用法:**
 <delete_file>
-<path>path/to/file.txt</path>
+<paths>path/to/file1.txt,path/to/file2.txt</paths>
 </delete_file>
 
 **安全特性:**
@@ -25,17 +25,10 @@ export function getDeleteFileDescription(args: ToolArgs): string {
 
 **示例:**
 
-删除单个文件:
+删除单个或多个文件:
 \`\`\`xml
 <delete_file>
-<path>temp/old_file.txt</path>
-</delete_file>
-\`\`\`
-
-删除目录（需批准并显示统计）:
-\`\`\`xml
-<delete_file>
-<path>old_project/</path>
+<paths>temp/old_file.txt,old_project/</paths>
 </delete_file>
 \`\`\`
 `
