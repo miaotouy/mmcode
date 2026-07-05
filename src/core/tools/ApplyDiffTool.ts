@@ -278,7 +278,7 @@ export class ApplyDiffTool extends BaseTool<"apply_diff"> {
 						return `- Block ${idx + 1}: [FAILED] ${part.error || "Search content not found or mismatch."}`
 					}
 				})
-				partFailHint = `\n<error>\n==================================================\n[严重警告] 部分 DIFF 应用失败\n==================================================\n以下 SEARCH/REPLACE 块未能成功应用到 ${relPath}:\n${summaryLines.join("\n")}\n\n⚠️ 重要提示：由于上述失败，文件当前处于不完整/中间状态。\n在未验证当前文件内容的情况下进行任何后续编辑或假设，都将因行号偏移和内容不匹配而失败。\n\n在继续任何编辑或执行命令之前，你必须使用 <read_file> 工具检查 ${relPath} 的当前文件内容！\n==================================================\n</error>\n\n`
+				partFailHint = `\n<error>\n==================================================\n[严重警告] 部分 DIFF 应用失败\n==================================================\n以下 SEARCH/REPLACE 块未能成功应用到 ${relPath}:\n${summaryLines.join("\n")}\n\n⚠️ 重要提示：由于上述失败，文件当前处于不完整/中间状态。\n在未验证当前文件内容的情况下进行任何后续编辑或假设，都将因行号偏移和内容不匹配而失败。\n\n在继续任何编辑或执行命令之前，你必须使用 <read_file> 工具检查 ${relPath} 的当前文件内容！\nAI 禁止装瞎忽略此提示\n==================================================\n</error>\n\n`
 			}
 
 			// Get the formatted response message
