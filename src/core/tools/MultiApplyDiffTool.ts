@@ -730,7 +730,7 @@ ${errorDetails ? `\nTechnical details:\n${errorDetails}\n` : ""}
 							return `- Block ${idx + 1}: [FAILED] ${part.error || "Search content not found or mismatch."}`
 						}
 					})
-					partFailHint = `\n==================================================\n[WARNING] PARTIAL DIFF APPLICATION FAILURE\n==================================================\nSome SEARCH/REPLACE blocks could not be applied to ${relPath}:\n${summaryLines.join("\n")}\n\nBecause of these failures, the file content is now in an intermediate state. You MUST use the <read_file> tool to inspect the current file content before making any further edits or assumptions!\n==================================================\n\n`
+					partFailHint = `\n<error>\n==================================================\n[严重警告] 部分 DIFF 应用失败\n==================================================\n以下 SEARCH/REPLACE 块未能成功应用到 ${relPath}:\n${summaryLines.join("\n")}\n\n⚠️ 重要提示：由于上述失败，文件当前处于不完整/中间状态。\n在未验证当前文件内容的情况下进行任何后续编辑或假设，都将因行号偏移和内容不匹配而失败。\n\n在继续任何编辑或执行命令之前，你必须使用 <read_file> 工具检查 ${relPath} 的当前文件内容！\n==================================================\n</error>\n\n`
 				}
 
 				// Get the formatted response message
