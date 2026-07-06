@@ -730,29 +730,14 @@ export class ReadFileTool extends BaseTool<"read_file"> {
 	getReadFileToolDescription(blockName: string, nativeArgs: { files: FileEntry[] }): string
 	getReadFileToolDescription(blockName: string, second: any): string {
 		// If native typed args ({ files: FileEntry[] }) were provided
-		// kilocode_change start
 		if (second && typeof second === "object" && "files" in second && Array.isArray(second.files)) {
-			const files = second.files as FileEntry[]
-			const paths = files.map((f) => f?.path).filter(Boolean) as string[]
+			const paths = (second.files as FileEntry[]).map((f) => f?.path).filter(Boolean) as string[]
 			if (paths.length === 0) {
 				return `[${blockName} with no valid paths]`
 			} else if (paths.length === 1) {
-				const file = files[0]
-				let rangeStr = ""
-				if (file.lineRanges && file.lineRanges.length > 0) {
-					rangeStr = ` (lines ${file.lineRanges.map((r) => `${r.start}-${r.end}`).join(", ")})`
-				}
-				return `[${blockName} for '${paths[0]}'${rangeStr}. Reading multiple files at once is more efficient for the LLM. If other files are relevant to your current task, please read them simultaneously.]`
+				return `[${blockName} for '${paths[0]}'. Reading multiple files at once is more efficient for the LLM. If other files are relevant to your current task, please read them simultaneously.]`
 			} else if (paths.length <= 3) {
-				const pathList = files
-					.map((f) => {
-						let rangeStr = ""
-						if (f.lineRanges && f.lineRanges.length > 0) {
-							rangeStr = ` (lines ${f.lineRanges.map((r) => `${r.start}-${r.end}`).join(", ")})`
-						}
-						return `'${f.path}'${rangeStr}`
-					})
-					.join(", ")
+				const pathList = paths.map((p) => `'${p}'`).join(", ")
 				return `[${blockName} for ${pathList}]`
 			} else {
 				return `[${blockName} for ${paths.length} files]`
@@ -771,40 +756,9 @@ export class ReadFileTool extends BaseTool<"read_file"> {
 				if (paths.length === 0) {
 					return `[${blockName} with no valid paths]`
 				} else if (paths.length === 1) {
-					const file = files[0]
-					let rangeStr = ""
-					if (file.line_range) {
-						const ranges = Array.isArray(file.line_range) ? file.line_range : [file.line_range]
-						const formattedRanges = ranges
-							.map((range: any) => {
-								const match = String(range).match(/(\d+)-(\d+)/)
-								return match ? `${match[1]}-${match[2]}` : null
-							})
-							.filter(Boolean)
-						if (formattedRanges.length > 0) {
-							rangeStr = ` (lines ${formattedRanges.join(", ")})`
-						}
-					}
-					return `[${blockName} for '${paths[0]}'${rangeStr}. Reading multiple files at once is more efficient for the LLM. If other files are relevant to your current task, please read them simultaneously.]`
+					return `[${blockName} for '${paths[0]}'. Reading multiple files at once is more efficient for the LLM. If other files are relevant to your current task, please read them simultaneously.]`
 				} else if (paths.length <= 3) {
-					const pathList = files
-						.map((f: any) => {
-							let rangeStr = ""
-							if (f.line_range) {
-								const ranges = Array.isArray(f.line_range) ? f.line_range : [f.line_range]
-								const formattedRanges = ranges
-									.map((range: any) => {
-										const match = String(range).match(/(\d+)-(\d+)/)
-										return match ? `${match[1]}-${match[2]}` : null
-									})
-									.filter(Boolean)
-								if (formattedRanges.length > 0) {
-									rangeStr = ` (lines ${formattedRanges.join(", ")})`
-								}
-							}
-							return `'${f.path}'${rangeStr}`
-						})
-						.join(", ")
+					const pathList = paths.map((p) => `'${p}'`).join(", ")
 					return `[${blockName} for ${pathList}]`
 				} else {
 					return `[${blockName} for ${paths.length} files]`
@@ -814,11 +768,7 @@ export class ReadFileTool extends BaseTool<"read_file"> {
 				return `[${blockName} with unparsable args]`
 			}
 		} else if (blockParams?.path) {
-			let rangeStr = ""
-			if (blockParams.start_line && blockParams.end_line) {
-				rangeStr = ` (lines ${blockParams.start_line}-${blockParams.end_line})`
-			}
-			return `[${blockName} for '${blockParams.path}'${rangeStr}. Reading multiple files at once is more efficient for the LLM. If other files are relevant to your current task, please read them simultaneously.]`
+			return `[${blockName} for '${blockParams.path}'. Reading multiple files at once is more efficient for the LLM. If other files are relevant to your current task, please read them simultaneously.]`
 		} else if (blockParams?.files) {
 			// Back-compat: some paths may still synthesize params.files; try to parse if present
 			try {
@@ -826,22 +776,9 @@ export class ReadFileTool extends BaseTool<"read_file"> {
 				if (Array.isArray(files) && files.length > 0) {
 					const paths = files.map((f: any) => f?.path).filter(Boolean) as string[]
 					if (paths.length === 1) {
-						const file = files[0]
-						let rangeStr = ""
-						if (file.lineRanges && file.lineRanges.length > 0) {
-							rangeStr = ` (lines ${file.lineRanges.map((r: any) => `${r.start}-${r.end}`).join(", ")})`
-						}
-						return `[${blockName} for '${paths[0]}'${rangeStr}. Reading multiple files at once is more efficient for the LLM. If other files are relevant to your current task, please read them simultaneously.]`
+						return `[${blockName} for '${paths[0]}'. Reading multiple files at once is more efficient for the LLM. If other files are relevant to your current task, please read them simultaneously.]`
 					} else if (paths.length <= 3) {
-						const pathList = files
-							.map((f: any) => {
-								let rangeStr = ""
-								if (f.lineRanges && f.lineRanges.length > 0) {
-									rangeStr = ` (lines ${f.lineRanges.map((r: any) => `${r.start}-${r.end}`).join(", ")})`
-								}
-								return `'${f.path}'${rangeStr}`
-							})
-							.join(", ")
+						const pathList = paths.map((p) => `'${p}'`).join(", ")
 						return `[${blockName} for ${pathList}]`
 					} else {
 						return `[${blockName} for ${paths.length} files]`
@@ -852,7 +789,6 @@ export class ReadFileTool extends BaseTool<"read_file"> {
 				return `[${blockName} with unparsable files]`
 			}
 		}
-		// kilocode_change end
 
 		return `[${blockName} with missing path/args/files]`
 	}

@@ -117,9 +117,7 @@ export async function buildNativeToolsArrayWithRestrictions(options: BuildToolsO
 	}
 
 	// Determine if partial reads are enabled based on maxReadFileLine setting.
-	// kilocode_change start
-	const partialReadsEnabled = true
-	// kilocode_change end
+	const partialReadsEnabled = maxReadFileLine !== -1
 
 	// Check if the model supports images for read_file tool description.
 	const supportsImages = modelInfo?.supportsImages ?? false

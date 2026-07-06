@@ -4206,9 +4206,7 @@ export class Task extends EventEmitter<TaskEvents> implements TaskLike {
 				enableMcpServerCreation,
 				language,
 				rooIgnoreInstructions,
-				// kilocode_change start
-				true,
-				// kilocode_change end
+				maxReadFileLine !== -1,
 				{
 					maxConcurrentFileReads: maxConcurrentFileReads ?? 5,
 					todoListEnabled: apiConfiguration?.todoListEnabled ?? true,
