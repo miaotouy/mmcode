@@ -193,6 +193,7 @@ const ChatViewComponent: React.ForwardRefRenderFunction<ChatViewRef, ChatViewPro
 
 	const [inputValue, setInputValue] = useState("")
 	const inputValueRef = useRef(inputValue)
+	const pendingFeedbackRef = useRef<{ text: string; images: string[] } | null>(null) // kilocode_change
 	const textAreaRef = useRef<HTMLTextAreaElement>(null)
 	const [sendingDisabled, setSendingDisabled] = useState(false)
 	const [selectedImages, setSelectedImages] = useState<string[]>([])
@@ -341,6 +342,7 @@ const ChatViewComponent: React.ForwardRefRenderFunction<ChatViewRef, ChatViewPro
 				case "ask":
 					// Reset user response flag when a new ask arrives to allow auto-approval
 					userRespondedRef.current = false
+					pendingFeedbackRef.current = null // kilocode_change: clear backup on new ask
 					const isPartial = lastMessage.partial === true
 					switch (lastMessage.ask) {
 						case "api_req_failed":
@@ -509,9 +511,20 @@ const ChatViewComponent: React.ForwardRefRenderFunction<ChatViewRef, ChatViewPro
 							setEnableButtons(false)
 							setPrimaryButtonText(undefined)
 							setSecondaryButtonText(undefined)
+							pendingFeedbackRef.current = null // kilocode_change: clear backup on successful next step
 							break
 						case "api_req_finished":
+							pendingFeedbackRef.current = null // kilocode_change
+							break
 						case "error":
+							// kilocode_change start: rollback input on failure
+							if (pendingFeedbackRef.current) {
+								setInputValue(pendingFeedbackRef.current.text)
+								setSelectedImages(pendingFeedbackRef.current.images)
+								pendingFeedbackRef.current = null
+							}
+							// kilocode_change end
+							break
 						case "text":
 						case "browser_action":
 						case "browser_action_result":
@@ -783,7 +796,6 @@ const ChatViewComponent: React.ForwardRefRenderFunction<ChatViewRef, ChatViewPro
 			userRespondedRef.current = true
 
 			const trimmedInput = text?.trim()
-
 			switch (clineAsk) {
 				case "api_req_failed":
 				case "command":
@@ -794,6 +806,9 @@ const ChatViewComponent: React.ForwardRefRenderFunction<ChatViewRef, ChatViewPro
 				case "report_bug":
 					// Only send text/images if they exist
 					if (trimmedInput || (images && images.length > 0)) {
+						// kilocode_change start: backup input for rollback on failure
+						pendingFeedbackRef.current = { text: trimmedInput || "", images: images || [] }
+						// kilocode_change end
 						vscode.postMessage({
 							type: "askResponse",
 							askResponse: "yesButtonClicked",
@@ -804,8 +819,10 @@ const ChatViewComponent: React.ForwardRefRenderFunction<ChatViewRef, ChatViewPro
 						setInputValue("")
 						setSelectedImages([])
 					} else {
+						pendingFeedbackRef.current = null // kilocode_change
 						vscode.postMessage({ type: "askResponse", askResponse: "yesButtonClicked" })
 					}
+					break
 					break
 				case "resume_task":
 					// For completed subtasks (tasks with a parentTaskId and a completion_result),
@@ -886,6 +903,9 @@ const ChatViewComponent: React.ForwardRefRenderFunction<ChatViewRef, ChatViewPro
 				case "use_mcp_server":
 					// Only send text/images if they exist
 					if (trimmedInput || (images && images.length > 0)) {
+						// kilocode_change start: backup input for rollback on failure
+						pendingFeedbackRef.current = { text: trimmedInput || "", images: images || [] }
+						// kilocode_change end
 						vscode.postMessage({
 							type: "askResponse",
 							askResponse: "noButtonClicked",
@@ -896,6 +916,7 @@ const ChatViewComponent: React.ForwardRefRenderFunction<ChatViewRef, ChatViewPro
 						setInputValue("")
 						setSelectedImages([])
 					} else {
+						pendingFeedbackRef.current = null // kilocode_change
 						// Responds to the API with a "This operation failed" and lets it try again
 						vscode.postMessage({ type: "askResponse", askResponse: "noButtonClicked" })
 					}

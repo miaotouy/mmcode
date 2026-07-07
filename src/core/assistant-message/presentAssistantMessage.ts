@@ -258,11 +258,14 @@ export async function presentAssistantMessage(cline: Task) {
 				if (error instanceof AskIgnoredError) {
 					return
 				}
+				// kilocode_change start: merge approval feedback into error message to prevent losing user input
+				let errorDetails = error.message ?? JSON.stringify(serializeError(error), null, 2)
+				if (approvalFeedback?.text) {
+					errorDetails = `[User Feedback during approval]: ${approvalFeedback.text}\n\n${errorDetails}`
+				}
 				const errorString = `Error ${action}: ${JSON.stringify(serializeError(error))}`
-				await cline.say(
-					"error",
-					`Error ${action}:\n${error.message ?? JSON.stringify(serializeError(error), null, 2)}`,
-				)
+				await cline.say("error", `Error ${action}:\n${errorDetails}`)
+				// kilocode_change end
 				pushToolResult(formatResponse.toolError(errorString, toolProtocol))
 			}
 
@@ -776,12 +779,15 @@ export async function presentAssistantMessage(cline: Task) {
 				if (error instanceof AskIgnoredError) {
 					return
 				}
+				// kilocode_change start: merge approval feedback into error message to prevent losing user input
+				let errorDetails = error.message ?? JSON.stringify(serializeError(error), null, 2)
+				if (approvalFeedback?.text) {
+					errorDetails = `[User Feedback during approval]: ${approvalFeedback.text}\n\n${errorDetails}`
+				}
 				const errorString = `Error ${action}: ${JSON.stringify(serializeError(error))}`
 
-				await cline.say(
-					"error",
-					`Error ${action}:\n${error.message ?? JSON.stringify(serializeError(error), null, 2)}`,
-				)
+				await cline.say("error", `Error ${action}:\n${errorDetails}`)
+				// kilocode_change end
 
 				pushToolResult(formatResponse.toolError(errorString, toolProtocol))
 			}
