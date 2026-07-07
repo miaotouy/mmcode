@@ -148,6 +148,10 @@ const SettingsView = forwardRef<SettingsViewRef, SettingsViewProps>((props, ref)
 
 	const [isDiscardDialogShow, setDiscardDialogShow] = useState(false)
 	const [isChangeDetected, setChangeDetected] = useState(false)
+	const isSaving = useRef(false) // kilocode_change - track saving state to prevent race conditions
+	const [indexingTabIndex, setIndexingTabIndex] = useState(0) // kilocode_change - moved up for use in state setters
+	const isIndexing = indexingTabIndex < sectionNames.length // kilocode_change - moved up for use in state setters
+	const isIndexingComplete = !isIndexing // kilocode_change - moved up
 	const [errorMessage, setErrorMessage] = useState<string | undefined>(undefined)
 	const [activeTab, setActiveTab] = useState<SectionName>(
 		targetSection && sectionNames.includes(targetSection as SectionName)
@@ -347,10 +351,14 @@ const SettingsView = forwardRef<SettingsViewRef, SettingsViewProps>((props, ref)
 	}, [kilocodeToken, openRouterApiKey, glamaApiKey, requestyApiKey])
 
 	useEffect(() => {
-		// Only update if we're not already detecting changes
-		// This prevents overwriting user changes that haven't been saved yet
-		// Also skip if we're loading a profile for editing
-		if (!isChangeDetected && !isLoadingProfileForEditing.current) {
+		// kilocode_change start - prevent race conditions during save
+		if (isSaving.current) {
+			// When we receive the broadcasted state after a successful save,
+			// we sync the cachedState with the new extensionState and reset flags.
+			setCachedState(extensionState)
+			setChangeDetected(false)
+			isSaving.current = false
+		} else if (!isChangeDetected && !isLoadingProfileForEditing.current) {
 			// When editing a different profile than the active one,
 			// don't overwrite apiConfiguration from extensionState since it contains
 			// the active profile's config, not the editing profile's config
@@ -366,6 +374,7 @@ const SettingsView = forwardRef<SettingsViewRef, SettingsViewProps>((props, ref)
 				setCachedState(extensionState)
 			}
 		}
+		// kilocode_change end
 	}, [extensionState, isChangeDetected, editingApiConfigName, currentApiConfigName])
 
 	// Bust the cache when settings are imported.
@@ -383,18 +392,25 @@ const SettingsView = forwardRef<SettingsViewRef, SettingsViewProps>((props, ref)
 	})
 	// kilocode_change end
 
-	const setCachedStateField: SetCachedStateField<keyof ExtensionStateContextType> = useCallback((field, value) => {
-		setCachedState((prevState) => {
-			// kilocode_change start
-			if (deepEqual(prevState[field], value)) {
-				return prevState
-			}
-			// kilocode_change end
+	const setCachedStateField: SetCachedStateField<keyof ExtensionStateContextType> = useCallback(
+		(field, value) => {
+			setCachedState((prevState) => {
+				// kilocode_change start
+				if (deepEqual(prevState[field], value)) {
+					return prevState
+				}
+				// kilocode_change end
 
-			setChangeDetected(true)
-			return { ...prevState, [field]: value }
-		})
-	}, [])
+				// kilocode_change start - don't mark as dirty during indexing
+				if (!isIndexing) {
+					setChangeDetected(true)
+				}
+				// kilocode_change end
+				return { ...prevState, [field]: value }
+			})
+		},
+		[isIndexing],
+	) // kilocode_change - add isIndexing dependency
 
 	// kilocode_change start
 	const setAutocompleteServiceSettingsField = useCallback(
@@ -441,13 +457,15 @@ const SettingsView = forwardRef<SettingsViewRef, SettingsViewProps>((props, ref)
 					value !== "" &&
 					value !== null
 
-				if (!isInitialSync) {
+				// kilocode_change start - don't mark as dirty during indexing
+				if (!isInitialSync && !isIndexing) {
 					setChangeDetected(true)
 				}
+				// kilocode_change end
 				return { ...prevState, apiConfiguration: { ...prevState.apiConfiguration, [field]: value } }
 			})
 		},
-		[],
+		[isIndexing], // kilocode_change - add isIndexing dependency
 	)
 
 	const setExperimentEnabled: SetExperimentEnabled = useCallback((id: ExperimentId, enabled: boolean) => {
@@ -538,6 +556,7 @@ const SettingsView = forwardRef<SettingsViewRef, SettingsViewProps>((props, ref)
 
 	const handleSubmit = () => {
 		if (isSettingValid) {
+			isSaving.current = true // kilocode_change - set saving flag to prevent race conditions
 			vscode.postMessage({
 				type: "updateSettings",
 				updatedSettings: {
@@ -660,11 +679,10 @@ const SettingsView = forwardRef<SettingsViewRef, SettingsViewProps>((props, ref)
 			// kilocode_change end - Auto-purge settings
 			vscode.postMessage({ type: "debugSetting", bool: cachedState.debug })
 
-			// After saving, we keep the cachedState as is and reset change detection.
+			// After saving, we keep the cachedState as is and wait for the broadcasted state.
 			// The extension will broadcast the new state, which will eventually update extensionState.
-			// Since isChangeDetected becomes false, the useEffect will then sync the new extensionState
-			// to cachedState, but only when it actually arrives.
-			setChangeDetected(false)
+			// We do NOT setChangeDetected(false) here to prevent the old extensionState from overwriting
+			// our cachedState before the new state arrives. The useEffect will handle resetting flags.
 		}
 	}
 
@@ -696,24 +714,7 @@ const SettingsView = forwardRef<SettingsViewRef, SettingsViewProps>((props, ref)
 		[setCachedState, setChangeDetected, extensionState], // Depend on extensionState to get the latest original state
 	)
 
-	// From time to time there's a bug that triggers unsaved changes upon rendering the SettingsView
-	// This is a (nasty) workaround to detect when this happens, and to force overwrite the unsaved changes
-	const renderStart = useRef<null | number>()
-	useEffect(() => {
-		renderStart.current = performance.now()
-	}, [])
-	useEffect(() => {
-		if (renderStart.current && process.env.NODE_ENV !== "test") {
-			const renderEnd = performance.now()
-			const renderTime = renderEnd - renderStart.current
-
-			if (renderTime < 100 && isChangeDetected) {
-				console.info("Overwriting unsaved changes in less than 100ms")
-				onConfirmDialogResult(true)
-			}
-		}
-	}, [isChangeDetected, onConfirmDialogResult])
-	// kilocode_change end
+	// kilocode_change - removed the nasty 100ms render-time workaround since we now properly prevent dirty state during indexing
 
 	// Handle tab changes with unsaved changes check
 	const handleTabChange = useCallback(
@@ -852,10 +853,7 @@ const SettingsView = forwardRef<SettingsViewRef, SettingsViewProps>((props, ref)
 	const { contextValue: searchContextValue, index: searchIndex } = useSearchIndexRegistry(getSectionLabel)
 
 	// Track which tabs have been indexed (visited at least once)
-	const [indexingTabIndex, setIndexingTabIndex] = useState(0)
 	const initialTab = useRef<SectionName>(activeTab)
-	const isIndexing = indexingTabIndex < sectionNames.length
-	const isIndexingComplete = !isIndexing
 	const tabTitlesRegistered = useRef(false)
 
 	// Index all tabs by cycling through them on mount
