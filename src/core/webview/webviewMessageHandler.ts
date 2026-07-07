@@ -2037,6 +2037,10 @@ export const webviewMessageHandler = async (
 			await provider.postStateToWebview()
 			break
 		// kilocode_change end
+		case "customAgentName":
+			await updateGlobalState("customAgentName", message.text ?? "")
+			await provider.postStateToWebview()
+			break
 		case "enhancePrompt":
 			if (message.text) {
 				try {

@@ -278,7 +278,7 @@
 	"response": "Response",
 	"arguments": "Arguments",
 	"text": {
-		"rooSaid": "Kilo said"
+		"rooSaid": "{{agentName}} said"
 	},
 	"feedback": {
 		"youSaid": "You said"

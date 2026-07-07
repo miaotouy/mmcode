@@ -1171,6 +1171,10 @@
 			"label": "使用回车键发送消息",
 			"description": "启用后，按回车键发送消息。无论是否启用，Ctrl+回车键始终发送消息，Shift+回车键始终换行。"
 		},
+		"customAgentName": {
+			"label": "自定义智能体名称",
+			"description": "自定义在聊天气泡和 Agent Manager 中显示的智能体名称（默认为 Kilo）。"
+		},
 		"costThreshold": {
 			"label": "隐藏低于阈值的费用",
 			"description": "仅显示超过此金额的请求成本。当详情面板打开时，成本始终可见。",

@@ -755,6 +755,10 @@
 			"label": "Send message with Enter",
 			"description": "When enabled, press Enter to send messages. Regardless of this setting, Ctrl+Enter always sends and Shift+Enter always adds a new line."
 		},
+		"customAgentName": {
+			"label": "Custom Agent Name",
+			"description": "Customize the agent name displayed in chat bubbles and Agent Manager (defaults to Kilo)."
+		},
 		"costThreshold": {
 			"label": "Hide cost below threshold",
 			"description": "Only show request costs above this amount. Costs are always visible when the details pane is open.",

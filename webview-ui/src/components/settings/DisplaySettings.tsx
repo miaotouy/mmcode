@@ -1,7 +1,7 @@
 // kilocode_change - new file
 import { HTMLAttributes, useMemo } from "react"
 import { useAppTranslation } from "@/i18n/TranslationContext"
-import { VSCodeCheckbox } from "@vscode/webview-ui-toolkit/react"
+import { VSCodeCheckbox, VSCodeTextField } from "@vscode/webview-ui-toolkit/react"
 import { Monitor } from "lucide-react"
 import { telemetryClient } from "@/utils/TelemetryClient"
 
@@ -11,13 +11,13 @@ import { Section } from "./Section"
 import { TaskTimeline } from "../chat/TaskTimeline"
 import { generateSampleTimelineData } from "../../utils/timeline/mockData"
 import { Slider } from "../ui"
-
 type DisplaySettingsProps = HTMLAttributes<HTMLDivElement> & {
 	showTaskTimeline?: boolean
 	sendMessageOnEnter?: boolean // kilocode_change
 	showTimestamps?: boolean
 	showDiffStats?: boolean // kilocode_change
 	reasoningBlockCollapsed: boolean
+	customAgentName?: string // kilocode_change: Custom agent name
 	setCachedStateField: SetCachedStateField<
 		| "showTaskTimeline"
 		| "sendMessageOnEnter"
@@ -26,6 +26,7 @@ type DisplaySettingsProps = HTMLAttributes<HTMLDivElement> & {
 		| "hideCostBelowThreshold"
 		| "showTimestamps"
 		| "showDiffStats"
+		| "customAgentName"
 	>
 	hideCostBelowThreshold?: number
 }
@@ -38,6 +39,7 @@ export const DisplaySettings = ({
 	setCachedStateField,
 	reasoningBlockCollapsed,
 	hideCostBelowThreshold,
+	customAgentName, // kilocode_change: Custom agent name
 	...props
 }: DisplaySettingsProps) => {
 	const { t } = useAppTranslation()
@@ -131,6 +133,21 @@ export const DisplaySettings = ({
 					</VSCodeCheckbox>
 					<div className="text-vscode-descriptionForeground text-sm mt-1">
 						{t("settings:display.sendMessageOnEnter.description")}
+					</div>
+				</div>
+
+				{/* Custom Agent Name Setting */}
+				<div className="flex flex-col gap-1 mt-3">
+					<div className="font-medium mb-1">{t("settings:display.customAgentName.label")}</div>
+					<VSCodeTextField
+						value={customAgentName || ""}
+						onInput={(e: any) => {
+							setCachedStateField("customAgentName", e.target.value)
+						}}
+						placeholder="Kilo"
+					/>
+					<div className="text-vscode-descriptionForeground text-sm mt-1">
+						{t("settings:display.customAgentName.description")}
 					</div>
 				</div>
 			</Section>

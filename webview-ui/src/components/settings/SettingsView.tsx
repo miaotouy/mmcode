@@ -229,6 +229,7 @@ const SettingsView = forwardRef<SettingsViewRef, SettingsViewProps>((props, ref)
 		maxReadFileLine,
 		showAutoApproveMenu, // kilocode_change
 		yoloMode, // kilocode_change
+		customAgentName, // kilocode_change: Custom agent name
 		showTaskTimeline, // kilocode_change
 		sendMessageOnEnter, // kilocode_change
 		showTimestamps, // kilocode_change
@@ -601,6 +602,7 @@ const SettingsView = forwardRef<SettingsViewRef, SettingsViewProps>((props, ref)
 					alwaysAllowFollowupQuestions: alwaysAllowFollowupQuestions ?? false,
 					followupAutoApproveTimeoutMs,
 					condensingApiConfigId: condensingApiConfigId || "",
+					customAgentName: customAgentName || "", // kilocode_change: Custom agent name
 					includeTaskHistoryInEnhance: includeTaskHistoryInEnhance ?? true,
 					reasoningBlockCollapsed: reasoningBlockCollapsed ?? true,
 					enterBehavior: enterBehavior ?? "send",
@@ -628,6 +630,7 @@ const SettingsView = forwardRef<SettingsViewRef, SettingsViewProps>((props, ref)
 			vscode.postMessage({ type: "showTimestamps", bool: showTimestamps }) // kilocode_change
 			vscode.postMessage({ type: "showDiffStats", bool: cachedState.showDiffStats }) // kilocode_change
 			vscode.postMessage({ type: "hideCostBelowThreshold", value: hideCostBelowThreshold }) // kilocode_change
+			vscode.postMessage({ type: "customAgentName", text: customAgentName || "" }) // kilocode_change: Custom agent name
 			vscode.postMessage({ type: "updateCondensingPrompt", text: customCondensingPrompt || "" })
 			vscode.postMessage({ type: "yoloGatekeeperApiConfigId", text: yoloGatekeeperApiConfigId || "" }) // kilocode_change: AI gatekeeper for YOLO mode
 			vscode.postMessage({ type: "setReasoningBlockCollapsed", bool: reasoningBlockCollapsed ?? true })
@@ -1205,6 +1208,7 @@ const SettingsView = forwardRef<SettingsViewRef, SettingsViewProps>((props, ref)
 								showTimestamps={cachedState.showTimestamps} // kilocode_change
 								showDiffStats={cachedState.showDiffStats} // kilocode_change
 								hideCostBelowThreshold={hideCostBelowThreshold}
+								customAgentName={customAgentName} // kilocode_change: Custom agent name
 								setCachedStateField={setCachedStateField}
 							/>
 						)}

@@ -23,6 +23,7 @@ import { ReasoningBlock } from "./ReasoningBlock"
 import MessageThumbnails from "./MessageThumbnails"
 import { vscode } from "../utils/vscode"
 import { StandardTooltip } from "../../../components/ui" // kilocode_change
+import { useExtensionState } from "../../../context/ExtensionStateContext" // kilocode_change
 import {
 	MessageCircle,
 	MessageCircleQuestion,
@@ -330,13 +331,14 @@ function MessageItem({
 	onApprovalResponse,
 }: MessageItemProps) {
 	const { t } = useTranslation("agentManager")
+	const { customAgentName } = useExtensionState()
 
 	// --- 1. Determine Message Style & Content ---
 	// Note: CLI JSON output uses "content" instead of "text" for message body
 	const messageText = message.text || (message as any).content || ""
 
 	let icon = <MessageCircle size={16} />
-	let title = t("messages.kiloSaid")
+	let title = t("messages.kiloSaid", { agentName: customAgentName || "Kilo" })
 	let content: React.ReactNode = null
 	let extraInfo: React.ReactNode = null
 	let suggestions: SuggestionItem[] | undefined
@@ -363,7 +365,7 @@ function MessageItem({
 			}
 			case "text": {
 				icon = <MessageCircle size={16} />
-				title = t("messages.kiloSaid")
+				title = t("messages.kiloSaid", { agentName: customAgentName || "Kilo" })
 				content = <SimpleMarkdown content={messageText} />
 				break
 			}

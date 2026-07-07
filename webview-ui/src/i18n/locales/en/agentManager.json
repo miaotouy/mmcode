@@ -74,7 +74,7 @@
 	},
 	"messages": {
 		"waiting": "Waiting for agent response...",
-		"kiloSaid": "Kilo said",
+		"kiloSaid": "{{agentName}} said",
 		"youSaid": "You said",
 		"apiRequest": "API Request",
 		"taskCompleted": "Task Completed",

@@ -557,6 +557,7 @@ export type ExtensionState = Pick<
 	| "codebaseIndexModels"
 	| "profileThresholds"
 	| "systemNotificationsEnabled" // kilocode_change
+	| "customAgentName" // kilocode_change
 	| "includeDiagnosticMessages"
 	| "maxDiagnosticMessages"
 	| "imageGenerationProvider"
@@ -805,6 +806,7 @@ export interface WebviewMessage {
 		| "snoozeAutocomplete" // kilocode_change
 		| "autoApprovalEnabled"
 		| "yoloMode" // kilocode_change
+		| "customAgentName" // kilocode_change
 		| "updateCustomMode"
 		| "deleteCustomMode"
 		| "setopenAiCustomModelInfo"

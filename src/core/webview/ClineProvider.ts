@@ -2872,6 +2872,7 @@ export class ClineProvider
 				}
 			})(),
 			appendSystemPrompt: stateValues.appendSystemPrompt, // kilocode_change: CLI append system prompt
+			customAgentName: stateValues.customAgentName, // kilocode_change: Custom agent name
 		}
 	}
 

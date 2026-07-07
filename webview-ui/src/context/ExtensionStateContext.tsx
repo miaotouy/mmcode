@@ -99,6 +99,8 @@ export interface ExtensionStateContextType extends ExtensionState {
 	setHasCompletedOnboarding: (value: boolean) => void // kilocode_change
 	alwaysAllowFollowupQuestions: boolean // New property for follow-up questions auto-approve
 	setAlwaysAllowFollowupQuestions: (value: boolean) => void // Setter for the new property
+	customAgentName?: string // kilocode_change: Custom agent name
+	setCustomAgentName: (value: string) => void // kilocode_change: Setter for custom agent name
 	followupAutoApproveTimeoutMs: number | undefined // Timeout in ms for auto-approving follow-up questions
 	setFollowupAutoApproveTimeoutMs: (value: number) => void // Setter for the timeout
 	condensingApiConfigId?: string
@@ -606,6 +608,10 @@ export const ExtensionStateContextProvider: React.FC<{ children: React.ReactNode
 			setState((prevState) => ({ ...prevState, experiments: { ...prevState.experiments, [id]: enabled } })),
 		setApiConfiguration,
 		setCustomInstructions: (value) => setState((prevState) => ({ ...prevState, customInstructions: value })),
+		setCustomAgentName: (value) => {
+			setState((prevState) => ({ ...prevState, customAgentName: value }))
+			vscode.postMessage({ type: "customAgentName", text: value })
+		},
 		setAlwaysAllowReadOnly: (value) => setState((prevState) => ({ ...prevState, alwaysAllowReadOnly: value })),
 		setAlwaysAllowReadOnlyOutsideWorkspace: (value) =>
 			setState((prevState) => ({ ...prevState, alwaysAllowReadOnlyOutsideWorkspace: value })),
